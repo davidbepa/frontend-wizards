@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Frontend Wizards — a magical, data-backed look at what front-end developers really do. Spells, stats and the path from apprentice to archmage."
+    />
+    <meta name="theme-color" content="#16262e" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Frontend Wizards" />
+    <meta
+      property="og:description"
+      content="We turn coffee + CSS into magic the whole world can click. A funny, credible tour of the front-end craft."
+    />
+    <meta property="og:type" content="website" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Fonts: preconnect + the three families of the "Arcane Academy" system -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>Frontend Wizards — the magic behind the web</title>
+  </head>
+  <body>
+    <!-- Scroll progress meter -->
+    <div class="scroll-progress" aria-hidden="true">
+      <span data-progress></span>
+    </div>
+
+    <!-- ───────────────────────── Header (floating pill) ───────────────────────── -->
+    <header class="site-header">
+      <nav class="nav-pill" aria-label="Primary">
+        <a class="brand" href="#top">
+          <span class="brand-name">Frontend&nbsp;Wizards</span>
+        </a>
+        <div class="nav-links">
+          <a href="#conjure">Conjure</a>
+          <a href="#arcade">Arcade</a>
+        </div>
+        <a
+          class="btn btn-primary btn-sm nav-cta"
+          href="#arcade"
+          aria-label="Play the arcade"
+        >
+          <span class="nav-cta-full">Play the arcade</span>
+          <span class="nav-cta-short" aria-hidden="true">Play</span>
+        </a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <!-- ───────────────────────── Hero ───────────────────────── -->
+      <section class="hero" id="hero">
+        <video
+          class="hero-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="auto"
+          poster="/hero-poster.jpg"
+          aria-hidden="true"
+        >
+          <source src="/hero.mp4" type="video/mp4" />
+        </video>
+        <!-- Static fallback shown when autoplay is blocked or reduced-motion is on.
+             src is set by JS only when needed, so it isn't downloaded otherwise. -->
+        <img class="hero-fallback" alt="" aria-hidden="true" />
+        <div class="hero-inner">
+          <p class="eyebrow reveal">
+            ✦ Conjured entirely with agentic coding ✦
+          </p>
+          <h1 class="hero-title reveal">
+            <span>Frontend</span>
+            <span class="aurora-text">Wizards</span>
+          </h1>
+          <p class="hero-sub reveal">
+            Every section, animation and sparkle on this page was summoned by an
+            AI agent from a single prompt.
+            <br />
+            A living spellbook of what the modern front-end can do when you
+            build <em>with</em> agents.
+          </p>
+          <div class="hero-actions reveal">
+            <a class="btn btn-primary" href="#conjure" data-confetti
+              >See what agents can conjure</a
+            >
+            <a class="btn btn-ghost" href="#arcade">Play the arcade</a>
+          </div>
+          <p class="hero-foot reveal">
+            No hand-written CSS, no templates — just prompts, agents, and real
+            cited data below.
+          </p>
+        </div>
+        <a class="scroll-cue" href="#conjure" aria-label="Scroll down">
+          <span></span>
+        </a>
+      </section>
+
+      <!-- ──────────── The Conjuring Studio (scroll-scrubbed render demo) ─────────────
+           Desktop-only. The scene (video + prompt window) is built by JS only on
+           ≥768px, so phones never download the mp4. Nothing here — and no ancestor —
+           may use overflow:hidden, or the sticky stage inside breaks. -->
+      <section class="conjure" id="conjure" aria-labelledby="conjure-title">
+        <div class="conjure-head">
+          <p class="kicker">Cast it yourself</p>
+          <h2 class="section-title" id="conjure-title">
+            Type the incantation,<br />watch it <em>render</em>
+          </h2>
+          <p class="section-lead conjure-lead">
+            This whole page was conjured the same way — one prompt, handed to an AI
+            agent. Scroll to write the spell and watch an ordinary developer transmute
+            into a Frontend Wizard, frame by frame.
+          </p>
+        </div>
+        <div class="conjure-mount" data-conjure></div>
+      </section>
+
+      <!-- ──────────── The True Form (WebGL x-ray reveal) ────────────
+           A gold-framed stage holding a WebGL canvas: a base portrait of an
+           everyday developer with a glowing line-art bearded wizard hidden
+           beneath. Move the cursor to "x-ray" their true form — the portrait
+           warps and splits, the wizard glows through. WebGL-absent / reduced-
+           motion fall back to static images (srcs set by JS only when shown).
+           See src/modules/trueForm.js. -->
+      <section
+        class="section true-form"
+        id="true-form"
+        aria-labelledby="true-form-title"
+      >
+        <div class="section-head section-head--center">
+          <p class="kicker">Their true form</p>
+          <h2 class="section-title" id="true-form-title">
+            Every developer is a <em>wizard</em><br />underneath
+          </h2>
+          <p class="section-lead">
+            Run your cursor across the portrait to x-ray the magic beneath the
+            mundane — the everyday dev distorts and a glowing arcane self bleeds
+            through. Move slowly; the spell follows your hand.
+          </p>
+        </div>
+
+        <div class="tf-stage" data-true-form>
+          <!-- WebGL target; JS sizes and paints it. Hidden until the scene is live. -->
+          <canvas class="tf-canvas" aria-hidden="true"></canvas>
+
+          <!-- Static fallback (WebGL absent OR reduced-motion). Both <img> start
+               WITHOUT src; trueForm.js sets them only when the fallback shows. -->
+          <img class="tf-fallback tf-fallback--base" alt="" aria-hidden="true" />
+          <img class="tf-fallback tf-fallback--wizard" alt="" aria-hidden="true" />
+
+          <p class="tf-sr-only">
+            A portrait of an everyday developer; a glowing line-art bearded
+            wizard is revealed beneath it as the cursor moves across the image.
+          </p>
+        </div>
+      </section>
+
+      <!-- ──────────────── Debug the Dungeon (Pac-style mini-game) ────────────────
+           A reskinned Pac-Man: a wizard-developer outruns four bugs through a
+           grimoire-maze. Phaser 3 is lazy-loaded only when the player hits Play
+           (see src/modules/arcade.js), so it never slows the initial page. -->
+      <section class="section arcade" id="arcade" aria-labelledby="arcade-title">
+        <div class="section-head section-head--center">
+          <p class="kicker">Debug the dungeon</p>
+          <h2 class="section-title" id="arcade-title">
+            Outrun the <em>bugs</em>
+          </h2>
+          <p class="section-lead">
+            One more spell to cast — a little arcade conjured for the page. Guide
+            the apprentice through the maze, gather every stray semicolon, and
+            quaff a potion to banish the bugs before they catch you.
+          </p>
+        </div>
+        <div class="arcade-cabinet" data-maze>
+          <div class="arcade-screen"><!-- the Phaser canvas mounts here --></div>
+          <div class="arcade-overlay" data-arcade-overlay></div>
+          <button class="arcade-exit" data-arcade-exit type="button" hidden>
+            Leave&nbsp;✕
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- ───────────────────────── Footer (parchment) ───────────────────────── -->
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="#top">
+            <span class="brand-mark" aria-hidden="true">🔮</span>
+            <span class="brand-name">Frontend&nbsp;Wizards</span>
+          </a>
+          <p>
+            Made with semantic HTML, far too much CSS, and a cinematic
+            background video — a small celebration of the front-end craft.
+          </p>
+        </div>
+        <div class="sources">
+          <h3>Sources &amp; receipts</h3>
+          <ul data-sources></ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="copyright">
+          Built as a celebration of the craft. No wizards were harmed in the
+          making of this page.
+        </p>
+        <p class="footer-meta">HTML · CSS · a sprinkle of JavaScript</p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

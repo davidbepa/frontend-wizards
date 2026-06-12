@@ -1,0 +1,576 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Frontend Wizards — base layer
+   Tokens · reset · typography · buttons · pill nav · parchment footer · a11y
+   Palette: "Arcane Academy" — petrol-teal canvas, parchment, brass & ember
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* surfaces — deep painterly petrol-teal */
+  --bg: #16262e;
+  --bg-2: #0f1c22;
+  --surface: #1d3138;
+  --surface-2: #25404a;
+  --surface-soft: rgba(37, 64, 74, 0.45);
+  --border: rgba(201, 162, 75, 0.18);
+  --border-strong: rgba(201, 162, 75, 0.42);
+
+  /* parchment — nav + footer */
+  --parchment: #f0e3c6;
+  --parchment-2: #e7d4ad;
+  --ink: #2c2519;
+  --ink-dim: #5c5037;
+  --ink-mute: #8a7c5d;
+
+  /* accents */
+  --gold: #c9a24b;
+  --gold-bright: #e0bd6b;
+  --ember: #d8843f;
+  --sage: #7a9c8d;
+  --sage-deep: #5f8273;
+
+  /* text on dark */
+  --text: #f3ead4;
+  --text-dim: #9fb2b3;
+  --text-mute: #6f8186;
+
+  /* gradients & glow (warm "molten gold" instead of neon aurora) */
+  --aurora: linear-gradient(135deg, #e0bd6b 0%, #c9a24b 45%, #d8843f 100%);
+  --aurora-soft: linear-gradient(
+    135deg,
+    rgba(224, 189, 107, 0.16),
+    rgba(201, 162, 75, 0.14),
+    rgba(216, 132, 63, 0.16)
+  );
+  --glow-gold:
+    0 0 0 1px rgba(201, 162, 75, 0.4), 0 14px 44px -12px rgba(201, 162, 75, 0.4);
+
+  /* type */
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: "EB Garamond", Georgia, "Times New Roman", serif;
+  --font-label: "Cinzel", Georgia, serif;
+
+  /* layout */
+  --maxw: 1160px;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+  --radius: 16px;
+  --radius-lg: 24px;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── reset ─────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1.06rem;
+  line-height: 1.62;
+  /* `clip` (not `hidden`) contains horizontal overflow WITHOUT turning the body
+     into a scroll container — which would break the Conjuring section's sticky stage. */
+  overflow-x: clip;
+  /* soft painterly glows: warm light up top, embers drifting below */
+  background-image:
+    radial-gradient(
+      70vw 55vw at 50% -12%,
+      rgba(201, 162, 75, 0.1),
+      transparent 60%
+    ),
+    radial-gradient(
+      48vw 48vw at 88% 8%,
+      rgba(122, 156, 141, 0.1),
+      transparent 58%
+    ),
+    radial-gradient(
+      46vw 46vw at 8% 120%,
+      rgba(216, 132, 63, 0.08),
+      transparent 62%
+    );
+  background-attachment: fixed;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.005em;
+}
+
+em {
+  font-style: italic;
+  color: var(--gold-bright);
+}
+
+::selection {
+  background: rgba(201, 162, 75, 0.32);
+  color: #fff;
+}
+
+/* ── molten-gold gradient text ─────────────────────────────────────────── */
+.aurora-text {
+  background: var(--aurora);
+  background-size: 220% 220%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: aurora-shift 9s var(--ease) infinite;
+}
+
+@keyframes aurora-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* ── labels & headings shared ──────────────────────────────────────────── */
+.kicker,
+.eyebrow {
+  font-family: var(--font-label);
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 4.5vw, 3.3rem);
+  margin-top: 0.7rem;
+  color: var(--text);
+}
+
+.section-lead {
+  margin-top: 1rem;
+  color: var(--text-dim);
+  font-size: clamp(1.05rem, 1.6vw, 1.22rem);
+  max-width: 48ch;
+}
+
+/* ── buttons ───────────────────────────────────────────────────────────── */
+.btn {
+  --btn-bg: transparent;
+  --shine: rgba(255, 255, 255, 0.55);
+  --shine-soft: rgba(255, 255, 255, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  padding: 0.82em 1.7em;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  white-space: nowrap;
+  background: var(--btn-bg);
+  color: var(--text);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.25s var(--ease),
+    box-shadow 0.25s var(--ease),
+    color 0.25s var(--ease),
+    border-color 0.25s var(--ease),
+    background 0.25s var(--ease),
+    filter 0.25s var(--ease);
+}
+
+/* cinematic shine: a skewed band of light that sweeps across on hover */
+.btn::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  bottom: -60%;
+  left: 0;
+  width: 55%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    var(--shine-soft) 35%,
+    var(--shine) 50%,
+    var(--shine-soft) 65%,
+    transparent 100%
+  );
+  transform: translateX(-180%) skewX(-18deg);
+  pointer-events: none;
+}
+
+.btn:hover::after {
+  transform: translateX(320%) skewX(-18deg);
+  transition: transform 1.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* primary = sage-green pill with cream text (the "Get the book" button) */
+.btn-primary {
+  border-color: transparent;
+  background: linear-gradient(180deg, var(--sage) 0%, var(--sage-deep) 100%);
+  color: #102018;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -2px 5px rgba(8, 20, 14, 0.3),
+    0 8px 22px -10px rgba(95, 130, 115, 0.7);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -2px 6px rgba(8, 20, 14, 0.35),
+    0 14px 40px -10px rgba(122, 156, 141, 0.85);
+}
+
+/* gold = brass pill with ink text (warm secondary action) */
+.btn-gold {
+  border-color: transparent;
+  background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 100%);
+  color: #2c2008;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 248, 224, 0.35),
+    inset 0 -2px 5px rgba(60, 42, 10, 0.3),
+    0 8px 22px -10px rgba(201, 162, 75, 0.7);
+}
+
+.btn-gold:hover {
+  filter: brightness(1.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 248, 224, 0.55),
+    inset 0 -2px 6px rgba(60, 42, 10, 0.35),
+    0 14px 40px -10px rgba(224, 189, 107, 0.9);
+}
+
+/* ghost = hairline border, fills with gold on hover */
+.btn-ghost {
+  --shine: rgba(224, 189, 107, 0.32);
+  --shine-soft: rgba(224, 189, 107, 0.07);
+  color: var(--text);
+}
+
+.btn-ghost:hover {
+  border-color: var(--gold);
+  color: var(--gold-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(224, 189, 107, 0.12),
+    var(--glow-gold);
+}
+
+.btn:active {
+  transform: scale(0.97);
+  filter: brightness(0.97);
+}
+
+.btn-sm {
+  padding: 0.6em 1.2em;
+  font-size: 0.82rem;
+}
+
+.btn-lg {
+  font-size: 1rem;
+  padding: 1em 2.2em;
+}
+
+.btn:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 3px;
+}
+
+/* ── header: a floating parchment pill ─────────────────────────────────── */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  padding: clamp(0.8rem, 2vw, 1.3rem) var(--pad);
+  pointer-events: none;
+}
+
+.nav-pill {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 1.9rem;
+  width: auto;
+  max-width: 100%;
+  padding: 0.35rem 0.35rem 0.35rem 1.1rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    #f6ecd4 0%,
+    var(--parchment) 60%,
+    var(--parchment-2) 100%
+  );
+  border: 1px solid rgba(120, 96, 48, 0.28);
+  box-shadow:
+    0 18px 50px -22px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-label);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.brand-mark {
+  font-size: 1.25rem;
+  filter: drop-shadow(0 1px 4px rgba(201, 162, 75, 0.5));
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.2rem;
+  margin: 0;
+  font-family: var(--font-label);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-dim);
+}
+
+.nav-links a {
+  position: relative;
+  padding: 0.2rem 0;
+  transition: color 0.2s var(--ease);
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ember);
+  transition: width 0.25s var(--ease);
+}
+
+.nav-links a:hover {
+  color: var(--ink);
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+@media (max-width: 860px) {
+  .nav-links {
+    display: none;
+  }
+  .nav-pill {
+    justify-content: space-between;
+  }
+}
+
+/* the header CTA carries a shorter label so the masthead stays on one tidy line */
+.nav-cta-short {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .nav-pill {
+    gap: 0.6rem;
+    padding-left: 1rem;
+  }
+  .brand-name {
+    font-size: 0.86rem;
+  }
+  .nav-cta-full {
+    display: none;
+  }
+  .nav-cta-short {
+    display: inline;
+  }
+}
+
+/* ── scroll progress + cursor canvas ───────────────────────────────────── */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 60;
+  background: transparent;
+  pointer-events: none;
+}
+
+.scroll-progress span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--aurora);
+  box-shadow: 0 0 12px rgba(201, 162, 75, 0.7);
+}
+
+/* ── footer: a parchment proclamation ──────────────────────────────────── */
+.site-footer {
+  position: relative;
+  overflow: hidden;
+  margin-top: 2rem;
+  padding: clamp(3rem, 6vw, 5rem) var(--pad) 2.4rem;
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--parchment) 0%, #ead9b6 100%);
+}
+
+/* torn-edge hairline of gold along the top */
+.site-footer::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.7;
+}
+
+.footer-grid {
+  position: relative;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+  gap: 2.5rem 3rem;
+}
+
+.footer-brand .brand {
+  font-size: 1.05rem;
+  margin-bottom: 0.9rem;
+}
+
+.footer-brand p {
+  color: var(--ink-dim);
+  font-size: 0.98rem;
+  max-width: 38ch;
+}
+
+.sources h3 {
+  font-family: var(--font-label);
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #9a6a2a;
+  margin-bottom: 1rem;
+}
+
+.sources ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.55rem 1.6rem;
+}
+
+.sources a {
+  color: var(--ink-dim);
+  font-size: 0.9rem;
+  transition: color 0.2s var(--ease);
+  border-bottom: 1px solid transparent;
+}
+
+.sources a:hover {
+  color: var(--ember);
+  border-bottom-color: var(--ember);
+}
+
+.footer-bottom {
+  position: relative;
+  max-width: var(--maxw);
+  margin: 2.6rem auto 0;
+  padding-top: 1.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.6rem;
+  color: var(--ink-mute);
+  font-size: 0.84rem;
+}
+
+.footer-meta {
+  font-family: var(--font-label);
+  letter-spacing: 0.1em;
+}
+
+@media (max-width: 680px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── reveal-on-scroll base state (JS adds .is-visible) ─────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.7s var(--ease),
+    transform 0.7s var(--ease);
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ═══ accessibility: honor reduced-motion everywhere ═══════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

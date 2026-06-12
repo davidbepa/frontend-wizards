@@ -1,0 +1,4 @@
+{
+  "_readme": "List the override art you've added to this folder and the game will load it in place of the built-in procedural art. See /sprites-todo.md for the exact prompts, filenames and sizes. Remove a name to fall back to the procedural version.",
+  "assets": ["hero", "bug0", "bug1", "bug2", "bug3", "rune", "potion", "bonus", "life"]
+}

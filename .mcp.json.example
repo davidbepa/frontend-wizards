@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "xai-images": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["mcp-servers/xai-images.mjs"],
+      "env": {
+        "XAI_API_KEY": "[YOUR_XAI_API_KEY]"
+      }
+    },
+    "openai-images": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["mcp-servers/openai-images.mjs"],
+      "env": {
+        "OPENAI_API_KEY": "[YOUR_OPENAI_API_KEY]"
+      }
+    }
+  }
+}
