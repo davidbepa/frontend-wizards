@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Frontend Wizards — a magical, data-backed look at what front-end developers really do. Spells, stats and the path from apprentice to archmage."
+      content="Frontend Wizards — a showcase of what you can build with nothing but AI prompts. Every section, shader and game on this page was conjured by an agent from a single sentence. Built by David Bergmann."
     />
     <meta name="theme-color" content="#16262e" />
 
@@ -13,7 +13,7 @@
     <meta property="og:title" content="Frontend Wizards" />
     <meta
       property="og:description"
-      content="We turn coffee + CSS into magic the whole world can click. A funny, credible tour of the front-end craft."
+      content="Every section, animation and shader here was summoned by an AI agent, one prompt at a time. A living showcase of vibecoding the modern front-end."
     />
     <meta property="og:type" content="website" />
 
@@ -23,11 +23,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@1,600&display=swap"
       rel="stylesheet"
     />
 
-    <title>Frontend Wizards — the magic behind the web</title>
+    <title>Frontend Wizards — conjured entirely from prompts</title>
   </head>
   <body>
     <!-- Scroll progress meter -->
@@ -84,13 +84,13 @@
           </h1>
           <p class="hero-sub reveal">
             Every section, animation and sparkle on this page was summoned by an
-            AI agent from a single prompt.
+            AI agent, one prompt at a time.
             <br />
             A living spellbook of what the modern front-end can do when you
             build <em>with</em> agents.
           </p>
           <div class="hero-actions reveal">
-            <a class="btn btn-primary" href="#conjure" data-confetti
+            <a class="btn btn-primary" href="#conjure"
               >See what agents can conjure</a
             >
             <a class="btn btn-ghost" href="#arcade">Play the arcade</a>
@@ -100,28 +100,9 @@
             cited data below.
           </p>
         </div>
-        <a class="scroll-cue" href="#conjure" aria-label="Scroll down">
+        <a class="scroll-cue" href="#true-form" aria-label="Scroll down">
           <span></span>
         </a>
-      </section>
-
-      <!-- ──────────── The Conjuring Studio (scroll-scrubbed render demo) ─────────────
-           Desktop-only. The scene (video + prompt window) is built by JS only on
-           ≥768px, so phones never download the mp4. Nothing here — and no ancestor —
-           may use overflow:hidden, or the sticky stage inside breaks. -->
-      <section class="conjure" id="conjure" aria-labelledby="conjure-title">
-        <div class="conjure-head">
-          <p class="kicker">Cast it yourself</p>
-          <h2 class="section-title" id="conjure-title">
-            Type the incantation,<br />watch it <em>render</em>
-          </h2>
-          <p class="section-lead conjure-lead">
-            This whole page was conjured the same way — one prompt, handed to an AI
-            agent. Scroll to write the spell and watch an ordinary developer transmute
-            into a Frontend Wizard, frame by frame.
-          </p>
-        </div>
-        <div class="conjure-mount" data-conjure></div>
       </section>
 
       <!-- ──────────── The True Form (WebGL x-ray reveal) ────────────
@@ -144,7 +125,8 @@
           <p class="section-lead">
             Run your cursor across the portrait to x-ray the magic beneath the
             mundane — the everyday dev distorts and a glowing arcane self bleeds
-            through. Move slowly; the spell follows your hand.
+            through. Move slowly; the spell follows your hand. The displacement, the
+            glow, the way it tracks your cursor — that shader was prompted into being, too.
           </p>
         </div>
 
@@ -164,6 +146,74 @@
         </div>
       </section>
 
+      <!-- ──────────── The Conjuring Studio (scroll-scrubbed render demo) ─────────────
+           Desktop-only. The scene (video + prompt window) is built by JS only on
+           ≥768px, so phones never download the mp4. Nothing here — and no ancestor —
+           may use overflow:hidden, or the sticky stage inside breaks. -->
+      <section class="conjure" id="conjure" aria-labelledby="conjure-title">
+        <div class="conjure-head">
+          <p class="kicker">Cast it yourself</p>
+          <h2 class="section-title" id="conjure-title">
+            Scroll to cast the spell,<br />watch it <em>render</em>
+          </h2>
+          <p class="section-lead conjure-lead">
+            This whole page was conjured the same way — prompt after prompt, handed
+            to an AI agent. As you scroll, the incantation writes itself and an
+            ordinary developer transmutes into a Frontend Wizard, frame by frame.
+            What you're scrubbing through
+            <em>is</em> how this page was made: prompt in, interface out.
+          </p>
+        </div>
+        <div class="conjure-mount" data-conjure></div>
+      </section>
+
+      <!-- ──────────── Behind the Wall (WebGL — monster frozen in ice) ────────────
+           A perspective-tilting pane of ice with a looping creature behind it (the
+           chaos every codebase keeps frozen out: legacy bugs, race conditions).
+           Move the cursor and the frost melts back where you point — the glass
+           clears to a sharp view of the monster and its eyes find you; the pane
+           rotates slightly toward the cursor. WebGL-absent / reduced-motion fall
+           back to a static composite (srcs set by JS only when shown, and the mp4
+           is never fetched in that path). See src/modules/iceWall.js. -->
+      <section
+        class="section ice-wall"
+        id="ice-wall"
+        aria-labelledby="ice-wall-title"
+      >
+        <div class="section-head section-head--center">
+          <p class="kicker">Behind the wall</p>
+          <h2 class="section-title" id="ice-wall-title">
+            Every codebase keeps a <em>monster</em><br />frozen behind the wall
+          </h2>
+          <p class="section-lead">
+            Beneath the clean interface, something claws to get out — the legacy
+            module no one dares touch, the race condition, the dependency from the
+            underworld. Wizards don't slay it; they <em>ward</em> it, freezing the
+            chaos behind a wall of clean abstractions. Run your cursor along the
+            ice: the frost melts back where you touch it and the creature's eyes
+            find you through the glass. The wall holds — for now. The ice, the
+            creature, the frost that melts where you touch — all conjured from
+            nothing but words.
+          </p>
+        </div>
+
+        <div class="iw-stage" data-ice-wall>
+          <!-- WebGL target; JS sizes and paints it. Hidden until the scene is live. -->
+          <canvas class="iw-canvas" aria-hidden="true"></canvas>
+
+          <!-- Static fallback (WebGL absent OR reduced-motion). Both <img> start
+               WITHOUT src; iceWall.js sets them only when the fallback shows. -->
+          <img class="iw-fallback iw-fallback--monster" alt="" aria-hidden="true" />
+          <img class="iw-fallback iw-fallback--ice" alt="" aria-hidden="true" />
+
+          <p class="iw-sr-only">
+            A monstrous creature of legacy bugs and chaos is frozen behind a wall
+            of ice; the frost clears to reveal it wherever the cursor moves across
+            the wall, and it presses against the glass from the other side.
+          </p>
+        </div>
+      </section>
+
       <!-- ──────────────── Debug the Dungeon (Pac-style mini-game) ────────────────
            A reskinned Pac-Man: a wizard-developer outruns four bugs through a
            grimoire-maze. Phaser 3 is lazy-loaded only when the player hits Play
@@ -177,7 +227,8 @@
           <p class="section-lead">
             One more spell to cast — a little arcade conjured for the page. Guide
             the apprentice through the maze, gather every stray semicolon, and
-            quaff a potion to banish the bugs before they catch you.
+            quaff a potion to banish the bugs before they catch you. A whole
+            playable game, summoned for one page with nothing but prompts.
           </p>
         </div>
         <div class="arcade-cabinet" data-maze>
@@ -186,6 +237,32 @@
           <button class="arcade-exit" data-arcade-exit type="button" hidden>
             Leave&nbsp;✕
           </button>
+        </div>
+      </section>
+
+      <!-- ──────────────── The Reveal (closing beat) ────────────────
+           Lands the page's whole thesis and carries the maker's credit. -->
+      <section class="section outro" id="reveal" aria-labelledby="outro-title">
+        <div class="section-head section-head--center">
+          <p class="kicker">The reveal</p>
+          <h2 class="section-title reveal" id="outro-title">
+            Every pixel here was a <em>prompt</em>
+          </h2>
+          <p class="section-lead reveal">
+            No hand-written CSS. No templates. No stock components. Each section,
+            shader and game on this page was described in plain language — and an
+            agent conjured it into being. That's the whole trick, and the whole
+            point.
+          </p>
+          <p class="outro-credit reveal">
+            Conjured by
+            <a
+              href="https://www.linkedin.com/in/david-bergmann/"
+              target="_blank"
+              rel="noopener"
+              >David&nbsp;Bergmann ↗</a
+            >
+          </p>
         </div>
       </section>
     </main>
@@ -199,13 +276,19 @@
             <span class="brand-name">Frontend&nbsp;Wizards</span>
           </a>
           <p>
-            Made with semantic HTML, far too much CSS, and a cinematic
-            background video — a small celebration of the front-end craft.
+            Built entirely from AI prompts — every section, shader and game
+            conjured by an agent. A small celebration of what vibecoding the
+            front-end can do.
           </p>
-        </div>
-        <div class="sources">
-          <h3>Sources &amp; receipts</h3>
-          <ul data-sources></ul>
+          <p class="footer-credit">
+            Conjured by
+            <a
+              href="https://www.linkedin.com/in/david-bergmann/"
+              target="_blank"
+              rel="noopener"
+              >David&nbsp;Bergmann ↗</a
+            >
+          </p>
         </div>
       </div>
       <div class="footer-bottom">
@@ -213,7 +296,7 @@
           Built as a celebration of the craft. No wizards were harmed in the
           making of this page.
         </p>
-        <p class="footer-meta">HTML · CSS · a sprinkle of JavaScript</p>
+        <p class="footer-meta">Prompts · Agents · WebGL</p>
       </div>
     </footer>
 

@@ -4,10 +4,10 @@ import './styles/sections.css'
 import { pillars, spells, stats, stack, grimoire, ladder, sources, work } from './data.js'
 import { initScroll } from './modules/scroll.js'
 import { initCounters } from './modules/counters.js'
-import { initConfetti } from './modules/confetti.js'
 import { initHeroVideo } from './modules/heroVideo.js'
 import { initConjure } from './modules/conjure.js'
 import { initTrueForm } from './modules/trueForm.js'
+import { initIceWall } from './modules/iceWall.js'
 import { initArcade } from './modules/arcade.js'
 
 // Small helpers ──────────────────────────────────────────────────────────────
@@ -134,16 +134,6 @@ function renderLadder() {
   })
 }
 
-function renderSources() {
-  const wrap = $('[data-sources]')
-  if (!wrap) return
-  Object.values(sources).forEach((s) => {
-    const li = el('li')
-    li.innerHTML = `<a href="${s.url}" target="_blank" rel="noopener">${s.label} ↗</a>`
-    wrap.appendChild(li)
-  })
-}
-
 // ── Boot ─────────────────────────────────────────────────────────────────────
 function boot() {
   renderPillars()
@@ -152,15 +142,14 @@ function boot() {
   renderGrimoire()
   renderStack()
   renderLadder()
-  renderSources()
 
   // Effects (each guards prefers-reduced-motion / capability internally)
   initScroll()
   initCounters()
-  initConfetti()
   initHeroVideo()
   initConjure()
   initTrueForm()
+  initIceWall()
   initArcade()
 }
 

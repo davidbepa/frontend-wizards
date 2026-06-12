@@ -45,7 +45,8 @@
     0 0 0 1px rgba(201, 162, 75, 0.4), 0 14px 44px -12px rgba(201, 162, 75, 0.4);
 
   /* type */
-  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-display: "Cinzel", Georgia, "Times New Roman", serif;
+  --font-accent: "Playfair Display", Georgia, "Times New Roman", serif;
   --font-body: "EB Garamond", Georgia, "Times New Roman", serif;
   --font-label: "Cinzel", Georgia, serif;
 
@@ -130,6 +131,15 @@ h3 {
 em {
   font-style: italic;
   color: var(--gold-bright);
+}
+
+/* Headings are Cinzel, which has no italic face — render the emphasized accent
+   words in a true-italic serif so they read as intentional, not faux-slanted. */
+h1 em,
+h2 em,
+h3 em {
+  font-family: var(--font-accent);
+  font-weight: 600;
 }
 
 ::selection {
@@ -474,9 +484,6 @@ a:focus-visible {
   position: relative;
   max-width: var(--maxw);
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
-  gap: 2.5rem 3rem;
 }
 
 .footer-brand .brand {
@@ -490,30 +497,21 @@ a:focus-visible {
   max-width: 38ch;
 }
 
-.sources h3 {
+.footer-credit {
+  margin-top: 1rem;
   font-family: var(--font-label);
-  font-size: 0.78rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: #9a6a2a;
-  margin-bottom: 1rem;
+  letter-spacing: 0.04em;
+  font-size: 0.92rem;
 }
 
-.sources ul {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 0.55rem 1.6rem;
-}
-
-.sources a {
-  color: var(--ink-dim);
-  font-size: 0.9rem;
-  transition: color 0.2s var(--ease);
-  border-bottom: 1px solid transparent;
-}
-
-.sources a:hover {
+.footer-credit a {
   color: var(--ember);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s var(--ease);
+}
+
+.footer-credit a:hover,
+.footer-credit a:focus-visible {
   border-bottom-color: var(--ember);
 }
 
@@ -533,12 +531,6 @@ a:focus-visible {
 .footer-meta {
   font-family: var(--font-label);
   letter-spacing: 0.1em;
-}
-
-@media (max-width: 680px) {
-  .footer-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ── reveal-on-scroll base state (JS adds .is-visible) ─────────────────── */

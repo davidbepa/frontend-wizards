@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Frontend Wizards — single source of truth for every real, cited number.
-// Each stat references a source by id; the Sources footer is generated from
-// `sources` so nothing on the page is an unbacked claim.
+// Each stat references a source by id and links it inline, so nothing on the
+// page is an unbacked claim.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const sources = {

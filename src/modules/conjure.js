@@ -4,8 +4,8 @@
 // One scroll progress (0→1) drives BOTH a video (scrubbed frame-by-frame, never
 // autoplayed) and a self-typing prompt window. The story: the incantation types
 // itself → an ordinary developer renders into a Frontend Wizard in the video →
-// "Conjured ✓". Mirrors the page's own claim: every section was summoned from a
-// single prompt handed to an AI agent.
+// "Conjured ✓". Mirrors the page's own claim: every section was prompted into
+// being by an AI agent.
 //
 // Desktop-only: on phones the scene is never built, so the mp4 is never fetched.
 // Reduced-motion: no scroll loop — the final state is rendered statically.
