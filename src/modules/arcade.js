@@ -27,15 +27,15 @@ export function initArcade() {
     const best = Save.high
     overlay.innerHTML = `
       <div class="arcade-card">
-        <p class="arcade-kicker">Mini-game</p>
+        <p class="arcade-kicker">Summoned mini-game</p>
         <h3 class="arcade-name">Debug the Dungeon</h3>
         <p class="arcade-blurb">
           Guide the apprentice through the grimoire-maze. Gather every stray
-          semicolon, quaff a potion to banish the bugs — and don't get caught.
+          semicolon, quaff a potion to ward the bugs — and don't get caught.
         </p>
         ${best ? `<p class="arcade-best">Best run · <strong>${best}</strong></p>` : ''}
         <button class="btn btn-primary arcade-play" data-play type="button">
-          ${best ? 'Play again' : 'Enter the dungeon'}
+          ${best ? 'Cast again' : 'Enter the dungeon'}
         </button>
         <p class="arcade-hint">
           <span>↑ ← ↓ →</span> or <span>W A S D</span> · swipe on touch · <span>Esc</span> to leave

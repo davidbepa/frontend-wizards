@@ -1502,32 +1502,179 @@
   }
 }
 
-/* ═══════════════════ The Reveal (closing outro) ═══════════════════
-   A quiet, centred closing beat that lands the page's thesis and carries
-   the maker's credit. Reuses the shared .section spacing + centred head. */
+/* ═══════════════════ The Reveal (the grimoire) ═══════════════════
+   The closing beat hands over the spellbook: the centred thesis head sits
+   above a grid of prompt cards, one per module, each with copy buttons. */
 .outro {
   text-align: center;
 }
 .outro .section-lead {
   margin-inline: auto;
 }
-.outro-credit {
-  margin-top: clamp(1.6rem, 3vw, 2.4rem);
+
+/* ── The grimoire: one full-width, collapsible card per module ── */
+.grimoire {
+  margin-top: clamp(2.4rem, 5vw, 4rem);
+  text-align: left;
+}
+.grimoire-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Each card is a <details>; collapsed by default, full width. */
+.grimoire-card {
+  width: 100%;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255, 248, 224, 0.05);
+  transition: border-color 0.3s var(--ease);
+}
+.grimoire-card[open] {
+  border-color: var(--border-strong);
+}
+
+/* The <summary> is the clickable header — strip the native marker. */
+.gc-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+.gc-head::-webkit-details-marker {
+  display: none;
+}
+.gc-head:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.grimoire-card[open] .gc-head {
+  padding-bottom: 1rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+.gc-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.18rem;
+  color: var(--text);
+  transition: color 0.2s var(--ease);
+}
+.gc-head:hover .gc-name {
+  color: var(--gold-bright);
+}
+.gc-heading {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.gc-summary {
+  display: block;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  margin-top: 0.2rem;
+}
+
+/* Chevron that rotates when the card opens. */
+.gc-toggle {
+  flex: none;
+  width: 0.62rem;
+  height: 0.62rem;
+  margin-top: 0.4rem;
+  border-right: 2px solid var(--gold);
+  border-bottom: 2px solid var(--gold);
+  transform: rotate(45deg);
+  transition: transform 0.25s var(--ease);
+}
+.grimoire-card[open] .gc-toggle {
+  transform: rotate(-135deg);
+}
+
+.gc-prompts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.gc-prompt {
+  padding-top: 0.9rem;
+}
+.gc-prompt + .gc-prompt {
+  border-top: 1px dashed var(--border);
+}
+
+.gc-prompt-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.55rem;
+}
+.gc-tag {
   font-family: var(--font-label);
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.82rem;
-  color: var(--text-dim);
+  letter-spacing: 0.14em;
+  font-size: 0.62rem;
+  font-weight: 600;
+  padding: 0.32em 0.7em;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  white-space: nowrap;
 }
-.outro-credit a {
-  color: var(--gold);
-  border-bottom: 1px solid transparent;
+.gc-tag--build {
+  color: var(--gold-bright);
+  background: rgba(201, 162, 75, 0.12);
+  border-color: rgba(201, 162, 75, 0.4);
+}
+.gc-tag--image {
+  color: var(--sage);
+  background: rgba(122, 156, 141, 0.12);
+  border-color: rgba(122, 156, 141, 0.42);
+}
+.gc-tag--video {
+  color: var(--ember);
+  background: rgba(216, 132, 63, 0.12);
+  border-color: rgba(216, 132, 63, 0.42);
+}
+
+.gc-copy {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 0.4em 0.85em;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  cursor: pointer;
+  white-space: nowrap;
   transition:
     color 0.2s var(--ease),
-    border-color 0.2s var(--ease);
+    border-color 0.2s var(--ease),
+    background 0.2s var(--ease);
 }
-.outro-credit a:hover,
-.outro-credit a:focus-visible {
+.gc-copy:hover,
+.gc-copy:focus-visible {
   color: var(--gold-bright);
-  border-bottom-color: var(--gold-bright);
+  border-color: var(--gold-bright);
+  background: rgba(201, 162, 75, 0.1);
+}
+.gc-copy.is-copied {
+  color: #356152;
+  border-color: rgba(95, 130, 115, 0.6);
+  background: rgba(95, 130, 115, 0.18);
+}
+
+.gc-text {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text-dim);
 }

@@ -2,11 +2,11 @@
 // Behind the Wall — a monster frozen in ice (WebGL).
 //
 // A perspective-tilting pane of ice with the creature looping behind it (a
-// VideoTexture). Move the cursor and the frost melts back where you point — the
-// glass clears to a sharp view of the monster, whose eyes glow through. The whole
-// pane rotates slightly toward the cursor for depth (the monster, set behind the
-// glass, parallaxes against it). The creature also periodically POUNDS the wall on
-// its own, pushing a cold bloom of pressure through the ice. On touch devices the
+// VideoTexture). The cursor tilts the pane toward it for depth (the monster, set
+// behind the glass, parallaxes against it). When the creature
+// POUNDS the wall in the clip
+// (fixed frames of its loop), the canvas jolts and a cold bloom of pressure
+// pushes through the ice — both synced to the video. On touch devices the
 // pane leans with the device instead (deviceorientation; iOS asks permission on
 // the first tap), with a slow auto-sway until the sensor is live.
 //
@@ -135,7 +135,7 @@ function build(mount) {
   video.className = 'iw-video'
   video.muted = true
   video.defaultMuted = true
-  video.loop = true
+  video.loop = false // we replay manually so there's a still pause between repeats
   video.playsInline = true
   video.setAttribute('playsinline', '')
   video.setAttribute('webkit-playsinline', '')
@@ -160,6 +160,7 @@ function build(mount) {
     uIceAspect: { value: 1 },
     uParallax: { value: new THREE.Vector2(0, 0) }, // monster slide vs ice (depth)
     uReveal: { value: 0.5 }, // constant clarity of the creature through the ice
+    uImpact: { value: 0 }, // pressure-bloom pulse, driven from the video's hits
     uDistort: { value: 0.065 }, // how hard the ice relief refracts the creature
     uCrackColor: { value: new THREE.Color(0.45, 0.75, 1.0) }, // icy cyan
     uMonsterTint: { value: new THREE.Color(0.82, 0.95, 1.06) }, // cool the creature
@@ -296,6 +297,24 @@ function build(mount) {
   let prevT = 0
   const MAX_TILT = 0.15 // radians (~8.5°) — rotate toward the cursor, gently
 
+  // ── impact shake: the canvas jolts when the creature pounds the wall ─────────
+  // The monster clip strikes the glass at fixed frames of its loop (PUNCH_TIMES).
+  // We jolt the canvas as the video crosses those frames and feed a matching
+  // pulse to the shader (uImpact) so its cold pressure-bloom swells on the very
+  // same hit — one sharp, decaying rattle per strike.
+  const PUNCH_TIMES = [3.2, 5.4] // seconds into /monster.mp4 where it hits the wall
+  let prevVideoT = 0
+  let shake = 0 // 0..1 jolt energy, rattles off after each hit
+  const SHAKE_DECAY = 0.0007 // per-second multiplier → ~0.4s rattle tail
+  // Each strike isn't a single hit — the wall rings: the slam, then diminishing
+  // aftershocks (delay = seconds after the hit; amp = jolt strength 0..1).
+  const ECHOES = [
+    { delay: 0.0, amp: 1.0 }, // the strike
+    { delay: 0.15, amp: 0.45 }, // first echo
+    { delay: 0.3, amp: 0.2 }, // fainter second echo
+  ]
+  const echoQueue = [] // pending jolts: { at: `time` secs, amp }
+
   const tick = (now) => {
     if (disposed) return
     if (!inView) {
@@ -328,6 +347,48 @@ function build(mount) {
       -pane.rotation.x * 0.5
     )
 
+    // Sync to the monster clip: as currentTime crosses a punch frame, fire a
+    // jolt. (currentTime only advances while in view; the vt >= prevVideoT guard
+    // skips the loop-wrap frame so the restart never reads as a fresh strike.)
+    const vt = video.currentTime
+    if (vt >= prevVideoT) {
+      for (let i = 0; i < PUNCH_TIMES.length; i++) {
+        const pt = PUNCH_TIMES[i]
+        // a fresh strike schedules the slam and its trailing echoes
+        if (prevVideoT < pt && vt >= pt) {
+          for (let j = 0; j < ECHOES.length; j++) {
+            echoQueue.push({ at: time + ECHOES[j].delay, amp: ECHOES[j].amp })
+          }
+        }
+      }
+    }
+    prevVideoT = vt
+
+    // Fire each scheduled jolt as its moment arrives — the slam, then the echoes.
+    // Entries gone stale (e.g. after an off-screen pause) just drop, never fire.
+    for (let i = echoQueue.length - 1; i >= 0; i--) {
+      if (time >= echoQueue[i].at) {
+        if (time - echoQueue[i].at < 0.12) shake = Math.max(shake, echoQueue[i].amp)
+        echoQueue.splice(i, 1)
+      }
+    }
+
+    // Smooth pressure pulse for the shader's bloom: 1 at each hit, ~0.3s falloff.
+    let impact = 0
+    for (let i = 0; i < PUNCH_TIMES.length; i++) {
+      const d = vt - PUNCH_TIMES[i]
+      if (d >= 0) impact = Math.max(impact, Math.exp(-d * 4.5))
+    }
+    uniforms.uImpact.value = impact
+
+    shake *= Math.pow(SHAKE_DECAY, dt)
+
+    // High-frequency rattle on two incommensurate axes, sharpened (shake²) so it
+    // reads as a hit, not a sway. Tiny vs the 1.5× overscan → no frame edge shows.
+    const jolt = shake * shake
+    camera.position.x = jolt * 0.09 * Math.sin(time * 96.0)
+    camera.position.y = jolt * 0.07 * Math.sin(time * 78.0 + 1.7)
+
     uniforms.uTime.value = time
     renderer.render(scene, camera)
 
@@ -340,11 +401,37 @@ function build(mount) {
     }
   }
 
+  // ── manual loop with a pause between repeats ────────────────────────────────
+  // The clip plays through, holds on its last frame for REPEAT_GAP, then plays
+  // again. Every (re)start clears any pending gap timer first, so scrolling away
+  // and back (or tabbing out) during the pause can't leave a stale replay queued
+  // that would later restart the clip mid-playback.
+  const REPEAT_GAP = 3000 // ms of stillness between repetitions
+  let replayTimer = 0
+  const clearReplay = () => {
+    if (replayTimer) {
+      clearTimeout(replayTimer)
+      replayTimer = 0
+    }
+  }
+  const playMonster = () => {
+    clearReplay()
+    video.play().catch(() => {}) // play() on an ended clip restarts it from 0
+  }
+  const onEnded = () => {
+    clearReplay()
+    replayTimer = setTimeout(() => {
+      replayTimer = 0
+      if (!disposed && inView && !document.hidden) video.play().catch(() => {})
+    }, REPEAT_GAP)
+  }
+  video.addEventListener('ended', onEnded)
+
   const io = new IntersectionObserver(
     (entries) => {
       inView = entries[0].isIntersecting
       if (inView) {
-        video.play().catch(() => {})
+        playMonster()
         start()
       } else if (!video.paused) {
         video.pause()
@@ -360,7 +447,7 @@ function build(mount) {
       rafId = 0
       video.pause()
     } else if (inView) {
-      video.play().catch(() => {})
+      playMonster()
       start()
     }
   }
@@ -389,7 +476,7 @@ function build(mount) {
         tex.image && tex.image.width ? tex.image.width / tex.image.height : 1
       resize()
       if (inView) {
-        video.play().catch(() => {})
+        playMonster()
         start()
       }
     },
@@ -406,8 +493,10 @@ function build(mount) {
     disposed = true
     if (rafId) cancelAnimationFrame(rafId)
     rafId = 0
+    clearReplay()
     ro.disconnect()
     io.disconnect()
+    video.removeEventListener('ended', onEnded)
     document.removeEventListener('visibilitychange', onVisibility)
     canvas.removeEventListener('pointermove', onPointerMove)
     canvas.removeEventListener('pointerleave', onPointerLeave)

@@ -40,6 +40,7 @@ export const fragmentShader = /* glsl */ `
   uniform float uIceAspect;
   uniform vec2  uParallax;     // monster offset from the tilt → parallax vs the ice
   uniform float uReveal;       // constant clarity of the creature through the ice
+  uniform float uImpact;       // pressure-bloom pulse, synced to the video's hits
   uniform float uDistort;      // how hard the ice relief refracts the creature
   uniform vec3  uCrackColor;   // icy glow hue (pressure bloom)
   uniform vec3  uMonsterTint;  // cools the creature into the frozen palette
@@ -73,10 +74,10 @@ export const fragmentShader = /* glsl */ `
     float canvasA = uResolution.x / uResolution.y;
     float tm = uTime;
 
-    // ── the creature pounds the wall: periodic, sharp pressure pulses ──────────
-    float slam  = pow(0.5 + 0.5 * sin(tm * 1.7), 4.0);
-    float slam2 = pow(0.5 + 0.5 * sin(tm * 2.3 + 1.5), 6.0);
-    float impact = max(slam, slam2 * 0.7);
+    // ── the creature pounds the wall: pressure pulses synced to the video ──────
+    // uImpact is set on the CPU from the monster clip's punch frames (see
+    // iceWall.js), so the cold bloom swells in lockstep with the actual hits.
+    float impact = uImpact;
 
     // ── the ice (the wall surface) + its relief, used to refract the creature ──
     vec2  iceUv  = coverUv(vUv, uIceAspect, canvasA);

@@ -10,7 +10,7 @@
 export const LEVELS = [
   {
     name: "The Linter's Lair",
-    beat: 'A gentle first descent — the bugs are sluggish and the halls forgiving.',
+    beat: 'A gentle initiation — the bugs are sluggish and the corridors forgiving.',
     braid: 0.95, // very loopy, easy to escape
     bugCount: 3,
     playerSpeed: 116,
@@ -22,7 +22,7 @@ export const LEVELS = [
   },
   {
     name: 'Null Pointer Nave',
-    beat: 'A fourth bug wakes. The corridors tighten and the chase grows bolder.',
+    beat: 'A fourth bug stirs. The corridors narrow and the hunt grows bold.',
     braid: 0.6,
     bugCount: 4,
     playerSpeed: 124,
@@ -34,7 +34,7 @@ export const LEVELS = [
   },
   {
     name: 'The Heisenbug Hollow',
-    beat: 'The deepest vault. Fast, relentless bugs and a maze full of dead-ends.',
+    beat: 'The deepest ward. Relentless bugs, dead-end corridors — only a true wizard escapes.',
     braid: 0.3,
     bugCount: 4,
     playerSpeed: 132,

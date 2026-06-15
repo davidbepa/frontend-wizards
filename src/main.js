@@ -9,6 +9,7 @@ import { initConjure } from './modules/conjure.js'
 import { initTrueForm } from './modules/trueForm.js'
 import { initIceWall } from './modules/iceWall.js'
 import { initArcade } from './modules/arcade.js'
+import { initReveal } from './modules/reveal.js'
 
 // Small helpers ──────────────────────────────────────────────────────────────
 const $ = (sel) => document.querySelector(sel)
@@ -142,6 +143,7 @@ function boot() {
   renderGrimoire()
   renderStack()
   renderLadder()
+  initReveal() // build the grimoire before initScroll so its .reveal cards are observed
 
   // Effects (each guards prefers-reduced-motion / capability internally)
   initScroll()

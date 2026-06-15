@@ -28,16 +28,16 @@ const DONE_AT = 0.95 //    within the scrub: the video reaches its end and the
 // ordinary dev → robed Wizard, slow turn to camera, teal-and-gold, portrait —
 // because that prompt↔result correspondence is what sells the effect.
 const PROMPT_TEXT =
-  'Take an everyday front-end developer and conjure them into a true Frontend Wizard — drape them in an enchanted teal-and-gold robe, set a glowing staff in their hand, and slowly turn them to face me. Cinematic, painterly, portrait.'
+  'Take an everyday front-end developer and reveal their true form — a robed Frontend Wizard draped in teal-and-gold, a glowing staff in hand. Turn them slowly to face me. Cinematic, painterly, portrait.'
 
 const STR = {
   studio: 'Spellforge',
-  conjure: 'Conjure',
+  conjure: 'Cast the spell',
   generating: 'Conjuring…',
   done: 'Conjured ✓',
   label: 'Incantation',
   aria:
-    'An everyday developer slowly transforms into a robed Frontend Wizard holding a glowing staff — rendered from the incantation typed beside it.',
+    'An everyday developer slowly reveals their true form — a robed Frontend Wizard holding a glowing staff, teal-and-gold, turning to face the viewer. Rendered from the incantation typed beside it.',
 }
 
 const clamp = (n, lo, hi) => (n < lo ? lo : n > hi ? hi : n)

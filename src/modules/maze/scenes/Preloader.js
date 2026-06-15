@@ -16,7 +16,7 @@ export default class Preloader extends Phaser.Scene {
     const h = VIEW.H
     this.add.rectangle(0, 0, w, h, C.bg2).setOrigin(0)
     this.add
-      .text(w / 2, h / 2 - 18, 'Summoning the dungeon…', {
+      .text(w / 2, h / 2 - 18, 'Casting the dungeon…', {
         fontFamily: FONT_LABEL,
         fontSize: '18px',
         color: '#e0bd6b',

@@ -50,7 +50,7 @@ export default class Results extends Phaser.Scene {
       .setOrigin(0.5)
 
     this.add
-      .text(cx, VIEW.H * 0.36, this.won ? 'Dungeon Cleared' : 'Caught by a Bug', {
+      .text(cx, VIEW.H * 0.36, this.won ? 'Grimoire Claimed' : 'Caught by a Bug', {
         fontFamily: FONT_DISPLAY,
         fontSize: '34px',
         color: '#f3ead4',
@@ -62,8 +62,8 @@ export default class Results extends Phaser.Scene {
         cx,
         VIEW.H * 0.44,
         this.won
-          ? 'Every bug banished. The grimoire is yours, Archmage.'
-          : 'The bugs got the better of you this time.',
+          ? 'Every bug warded. The order salutes you, Archmage.'
+          : 'The bugs prevailed this time. Recast the spell.',
         {
           fontFamily: FONT_BODY,
           fontSize: '15px',
@@ -89,20 +89,20 @@ export default class Results extends Phaser.Scene {
       })
       .setOrigin(0.5)
     this.add
-      .text(cx, VIEW.H * 0.645, newBest ? '★ New best!' : 'Best ' + Save.high, {
+      .text(cx, VIEW.H * 0.645, newBest ? '★ New record!' : 'Best ' + Save.high, {
         fontFamily: FONT_LABEL,
         fontSize: '12px',
         color: newBest ? '#7a9c8d' : '#6f8186',
       })
       .setOrigin(0.5)
 
-    this.button(cx, VIEW.H * 0.76, this.won ? 'Play Again' : 'Try Again', true, () => {
+    this.button(cx, VIEW.H * 0.76, this.won ? 'Cast Again' : 'Try Again', true, () => {
       this.cameras.main.fadeOut(300, 15, 28, 34)
       this.cameras.main.once('camerafadeoutcomplete', () =>
         this.scene.start('Game', { level: 0, score: 0, lives: START_LIVES, fresh: true }),
       )
     })
-    this.button(cx, VIEW.H * 0.85, 'Leave the Dungeon', false, () => {
+    this.button(cx, VIEW.H * 0.85, 'Leave the Grimoire', false, () => {
       const onExit = this.registry.get('onExit')
       if (onExit) onExit()
     })
