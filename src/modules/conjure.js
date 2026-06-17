@@ -7,7 +7,8 @@
 // "Conjured ✓". Mirrors the page's own claim: every section was prompted into
 // being by an AI agent.
 //
-// Desktop-only: on phones the scene is never built, so the mp4 is never fetched.
+// Runs at every width — the two-up stage stacks into a single column on phones
+// (see .conjure-stage in sections.css), so the mp4 is fetched on mobile too.
 // Reduced-motion: no scroll loop — the final state is rendered statically.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -42,39 +43,23 @@ const STR = {
 
 const clamp = (n, lo, hi) => (n < lo ? lo : n > hi ? hi : n)
 
-const mqDesktop = window.matchMedia('(min-width: 768px)')
 const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)')
 
 export function initConjure() {
   const mount = document.querySelector('[data-conjure]')
   if (!mount) return
 
-  let teardown = null
+  let teardown = build(mount)
 
-  const sync = () => {
-    const wantDesktop = mqDesktop.matches
-    if (wantDesktop && !teardown) {
-      teardown = build(mount)
-    } else if (!wantDesktop && teardown) {
+  // Rebuild on a motion-preference flip so the static/animated path is chosen cleanly.
+  mqReduce.addEventListener('change', () => {
+    if (teardown) {
       teardown()
       teardown = null
       mount.replaceChildren() // drops the <video> → stops any fetch/decoding
     }
-  }
-
-  // Rebuild on a motion-preference flip so the static/animated path is chosen cleanly.
-  const rebuild = () => {
-    if (teardown) {
-      teardown()
-      teardown = null
-      mount.replaceChildren()
-    }
-    sync()
-  }
-
-  mqDesktop.addEventListener('change', sync)
-  mqReduce.addEventListener('change', rebuild)
-  sync()
+    teardown = build(mount)
+  })
 }
 
 // Build the scene into `mount`; returns a teardown that releases everything.

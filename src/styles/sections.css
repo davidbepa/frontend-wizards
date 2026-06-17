@@ -1256,10 +1256,35 @@
   }
 }
 
-/* Desktop-only section. Below 768px nothing renders and the mp4 is never built. */
+/* Below 768px the two-up stage collapses to a single centred column — the render
+   screen above the prompt window — both scaled to fit inside the pinned viewport. */
 @media (max-width: 767px) {
-  .conjure {
-    display: none;
+  .conjure-stage {
+    height: 100svh;
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: clamp(0.9rem, 3vw, 1.5rem);
+  }
+  .conjure-screen {
+    justify-self: center;
+    max-height: 42svh;
+  }
+  .conjure-video {
+    max-height: 42svh;
+  }
+  .conjure-window {
+    justify-self: center;
+    max-width: min(100%, 26rem);
+  }
+  /* tighter prompt box so the long incantation + video both clear the fold */
+  .cw-body {
+    padding: 0.9rem 0.9rem 0.3rem;
+  }
+  .cw-input {
+    min-height: 0;
+    padding: 0.75rem 0.85rem;
+    font-size: 0.9rem;
+    line-height: 1.45;
   }
 }
 
@@ -1321,7 +1346,7 @@
   opacity: 0;
   transition: opacity 0.6s var(--ease);
   cursor: crosshair;
-  touch-action: pan-y; /* let the page still scroll vertically over the canvas */
+  touch-action: none; /* touch drives the reveal in-canvas — don't scroll the page */
 }
 .tf-stage.is-live .tf-canvas {
   opacity: 1;
