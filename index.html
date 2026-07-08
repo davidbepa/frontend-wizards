@@ -46,7 +46,6 @@
           <a href="#conjure">Conjure</a>
           <a href="#descent">Descend</a>
           <a href="#ice-wall">The wall</a>
-          <a href="#arcade">Arcade</a>
           <a href="#observatory">The reveal</a>
         </div>
         <a
@@ -193,13 +192,6 @@
             you don't climb that learning curve. Scroll, and you'll feel it: you
             fall through it — and the order opens beneath you.
           </p>
-          <p class="descent-ack">
-            Atmosphere conjured in
-            <a href="https://threejs.org" target="_blank" rel="noopener"
-              >three.js</a
-            >
-            · WebGL — god-rays, embers and the fall, summoned by an agent.
-          </p>
         </div>
         <div class="descent-mount" data-descent></div>
       </section>
@@ -207,9 +199,10 @@
       <!-- ──────────── Behind the Wall (WebGL — monster frozen in ice) ────────────
            A perspective-tilting pane of ice with a looping creature behind it (the
            chaos every codebase keeps frozen out: legacy bugs, race conditions).
-           Move the cursor and the frost melts back where you point — the glass
-           clears to a sharp view of the monster and its eyes find you; the pane
-           rotates slightly toward the cursor. WebGL-absent / reduced-motion fall
+           Move the cursor and the pane tilts toward it; the creature parallaxes
+           in the depths behind the glass (clarity is constant) and pounds the
+           wall at fixed frames, jolting the canvas with a cold pressure-bloom.
+           WebGL-absent / reduced-motion fall
            back to a static composite (srcs set by JS only when shown, and the mp4
            is never fetched in that path). See src/modules/iceWall.js. -->
       <section
@@ -226,9 +219,10 @@
             The legacy module no one dares touch, the race condition, the
             dependency from the underworld — something always claws to get out.
             Wizards don't slay it; they <em>ward</em> it, freezing the chaos
-            behind a wall of clean abstractions. Run your cursor along the ice:
-            the frost melts where you touch and the creature's eyes find you
-            through the glass. With agents holding the ward, the wall holds too.
+            behind a wall of clean abstractions. Move your cursor and the ice
+            tilts toward it — the creature slides in the depths behind the glass,
+            then pounds the wall from the other side. With agents holding the
+            ward, the wall holds too.
           </p>
         </div>
 
@@ -294,7 +288,7 @@
         <div class="section-head section-head--center">
           <p class="kicker">The reveal</p>
           <h2 class="section-title" id="observatory-title">
-            Every module was a <em>sentence</em>.<br />Here are the words.
+            Every module was a <em>prompt</em>.
           </h2>
           <p class="section-lead">
             This is the wizard's observatory: every section you just scrolled now

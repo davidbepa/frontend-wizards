@@ -8,8 +8,10 @@
 // section in particular reads its fall velocity straight off this eased scroll.
 //
 // Disabled under prefers-reduced-motion (native scroll), and re-evaluated when
-// the preference flips. Lenis also takes over in-page anchor links (anchors:true)
-// so the nav pill glides to each section instead of jumping.
+// the preference flips. In-page anchor links are NOT handled here (anchors:false)
+// — easing the scroll to a far section would fast-forward every scroll-scrubbed
+// scene in between. navTeleport.js "apparates" instead: fade to the void, jump
+// under cover, clear. It hard-jumps via the lenis instance getLenis() exposes.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import Lenis from 'lenis'
@@ -30,7 +32,7 @@ function start() {
     autoRaf: true, // Lenis owns its own rAF; module render loops stay separate
     duration: 1.05, // weight of the easing — a little glide, not syrup
     smoothWheel: true,
-    anchors: true, // nav `#…` links glide via lenis.scrollTo
+    anchors: false, // in-page links are apparated by navTeleport.js, not glided
   })
 }
 

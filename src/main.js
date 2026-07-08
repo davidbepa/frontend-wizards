@@ -3,6 +3,7 @@ import './styles/sections.css'
 
 import { pillars, spells, stats, stack, grimoire, ladder, sources, work } from './data.js'
 import { initSmoothScroll } from './modules/smoothScroll.js'
+import { initNavTeleport } from './modules/navTeleport.js'
 import { initScroll } from './modules/scroll.js'
 import { initCounters } from './modules/counters.js'
 import { initHeroVideo } from './modules/heroVideo.js'
@@ -148,6 +149,7 @@ function boot() {
 
   // Effects (each guards prefers-reduced-motion / capability internally)
   initSmoothScroll() // global Lenis eased scroll — drives the descent's fall feel
+  initNavTeleport() // in-page anchors apparate (fade-cut) instead of gliding
   initScroll()
   initCounters()
   initHeroVideo()

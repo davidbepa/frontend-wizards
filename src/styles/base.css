@@ -547,6 +547,30 @@ a:focus-visible {
   transform: none;
 }
 
+/* ── apparate: full-viewport "void" curtain masking nav teleports ─────────
+   navTeleport.js fades this in, hard-jumps to the target section under cover,
+   then fades it out — so the scroll-scrubbed scenes in between never play
+   mid-flight. Above everything (header pill is z-index 60). FADE_MS in the JS
+   must match the opacity transition below. */
+.void-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    120vmax 120vmax at 50% 50%,
+    var(--bg) 0%,
+    var(--bg-2) 68%,
+    #0a1418 100%
+  );
+  transition: opacity 260ms var(--ease);
+}
+
+.void-curtain.is-covering {
+  opacity: 1;
+}
+
 /* ═══ accessibility: honor reduced-motion everywhere ═══════════════════════ */
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -563,5 +587,9 @@ a:focus-visible {
   .reveal {
     opacity: 1;
     transform: none;
+  }
+  /* No fade under reduced-motion — navTeleport.js cuts instantly instead. */
+  .void-curtain {
+    display: none;
   }
 }
