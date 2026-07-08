@@ -113,15 +113,18 @@ export function initObservatory() {
 
   let teardown = build(mount)
 
-  // Rebuild on a motion-preference flip so the static/animated path is clean.
-  mqReduce.addEventListener('change', () => {
+  const rebuild = () => {
     if (teardown) {
       teardown()
       teardown = null
     }
     mount.replaceChildren()
     teardown = build(mount)
-  })
+  }
+  // Rebuild on a motion-preference flip (static ↔ animated) or when crossing the
+  // narrow breakpoint (floating rig ↔ tappable grid) so the right layout is built.
+  mqReduce.addEventListener('change', rebuild)
+  mqNarrow.addEventListener('change', rebuild)
 }
 
 // ── Capability ────────────────────────────────────────────────────────────────
@@ -185,7 +188,11 @@ function build(mount) {
   const field = document.createElement('div')
   field.className = 'obs-field'
   const narrow = mqNarrow.matches
-  const defs = narrow ? MODULES.filter((m) => !m.narrow) : MODULES
+  // Every module is always rendered — the reveal promises "every module was a
+  // prompt", so every incantation must be reachable. On wide screens the panels
+  // float in the 3D rig over the core; on narrow screens they flow into a static,
+  // tappable grid below the console instead (all seven, none dropped).
+  const defs = MODULES
   const panels = defs.map((m) => {
     const btn = document.createElement('button')
     btn.type = 'button'
@@ -211,7 +218,10 @@ function build(mount) {
     field.appendChild(btn)
     return { el: btn, ...m }
   })
-  stage.appendChild(field)
+  // Wide: the field is the floating rig inside the console. Narrow: it's a static
+  // grid appended below the console (see mount.appendChild after the stage).
+  if (narrow) field.classList.add('obs-field--grid')
+  else stage.appendChild(field)
 
   // a11y: one honest description of the whole scene.
   const sr = document.createElement('p')
@@ -221,6 +231,7 @@ function build(mount) {
   stage.appendChild(sr)
 
   mount.appendChild(stage)
+  if (narrow) mount.appendChild(field) // the tappable spell grid, below the console
 
   // ── Reduced motion: settled composite, no canvas, no loop ─────────────────────
   // (the panels + reveal modal still work — only the animation is dropped)
@@ -305,9 +316,11 @@ function build(mount) {
     const engage = pointerActive ? 0.35 : 0.12
     energy = lerp(energy, 0.35 + 0.65 * assemble + engage * (Math.abs(cX) + Math.abs(cY)) * 0.5, 0.08)
 
-    // parallax the glass panels + reticle by depth (camera-like layered depth)
+    // parallax the glass panels + reticle by depth (camera-like layered depth).
+    // Skipped on narrow (!narrow short-circuits): there the panels are a static
+    // CSS grid, not the floating rig, so they must keep their own layout/opacity.
     const THROW = 44 // px at depth 1
-    for (let i = 0; i < panels.length; i++) {
+    for (let i = 0; !narrow && i < panels.length; i++) {
       const p = panels[i]
       const dep = p.depth
       const dx = -cX * THROW * dep

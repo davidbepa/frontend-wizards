@@ -21,10 +21,10 @@ brass-gold filigree).
 | **Hero**           | Full-bleed looping video intro with a graceful poster/image fallback.                                     | `<video>` + `heroVideo.js`    |
 | **True form**      | A cursor "x-ray" portrait — move over the developer and a glowing line-art wizard bleeds through.         | WebGL displacement shader     |
 | **Conjure**        | A scroll-scrubbed clip of a dev transmuting into a wizard, paired with the incantation that rendered it.  | Scroll-driven video scrubbing |
+| **The descent**    | A scroll-pinned fall through the craft: a plunging video, a tumbling wizard, and tool-sigils that rush past under a WebGL light atmosphere. | Lenis + WebGL                 |
 | **The wall**       | A monster frozen behind ice; frost melts where you point, and the canvas jolts as the creature pounds it. | WebGL + `VideoTexture`        |
 | **Arcade**         | _Debug the Dungeon_ — a full playable maze game: gather semicolons, quaff potions, outrun the bugs.       | Phaser 3                      |
-| **The reveal**     | The grimoire — a collapsible card per module with copy-able build + asset-generation prompts.             | DOM + Clipboard API           |
-| **Cited stats**    | Data-driven sections where every number links to a real source (Stack Overflow, BLS, State of JS, …).     | `src/data.js`                 |
+| **The reveal**     | The Observatory — a WebGL holographic console; each floating panel opens the exact prompt that summoned that module (all seven reachable, even on phones). | Three.js + `observatory.js`   |
 
 Every effect guards `prefers-reduced-motion` and degrades gracefully when WebGL
 or video isn't available.
@@ -68,18 +68,20 @@ any static host (GitHub Pages, Netlify, or even opened from a sub-path).
 .
 ├── index.html                 # the single page; sections + fallback markup
 ├── src/
-│   ├── main.js                # boot: render data sections, then init effects
-│   ├── data.js                # single source of truth for every cited number
+│   ├── main.js                # boot: init every section effect
 │   ├── modules/
+│   │   ├── smoothScroll.js    # global Lenis eased scroll (shared)
+│   │   ├── navTeleport.js     # in-page anchors "apparate" (fade-cut jump)
 │   │   ├── heroVideo.js       # hero video + fallback
 │   │   ├── trueForm.js        # cursor x-ray portrait (WebGL)
 │   │   ├── conjure.js         # scroll-scrubbed transformation
+│   │   ├── descent.js         # scroll-pinned fall through the craft (WebGL)
 │   │   ├── iceWall.js         # monster-behind-ice, video-synced impact shake
 │   │   ├── arcade.js          # arcade overlay → loads the maze game
-│   │   ├── reveal.js          # the grimoire (prompt cards + copy buttons)
-│   │   ├── scroll.js          # shared .reveal IntersectionObserver
-│   │   ├── counters.js        # animated stat counters
-│   │   ├── gl/                # GLSL shaders (iceWall, trueForm)
+│   │   ├── observatory.js     # the reveal: holographic console of prompt panels
+│   │   ├── spellbook.js       # the portable prompt catalogue (pure data)
+│   │   ├── scroll.js          # scroll-progress meter + .reveal IntersectionObserver
+│   │   ├── gl/                # GLSL shaders (iceWall, trueForm, descent)
 │   │   └── maze/              # Phaser game: scenes, levels, generation, audio
 │   └── styles/                # base.css (design tokens) + sections.css
 ├── public/                    # videos, posters, sprites, maze assets
@@ -92,9 +94,10 @@ any static host (GitHub Pages, Netlify, or even opened from a sub-path).
 
 ## ✦ The grimoire (portable prompts)
 
-The whole point of the page: the **reveal** section (`src/modules/reveal.js`)
-renders, for each module, the generic build prompt that created it plus any
-image/video generation prompts its art needed. The prompts use
+The whole point of the page: the **reveal** section — the Observatory
+(`src/modules/observatory.js`) — surfaces, for each module, the generic build
+prompt that created it plus any image/video generation prompts its art needed.
+The catalogue itself lives in `src/modules/spellbook.js`. The prompts use
 `{{PLACEHOLDERS}}` for brand specifics and instruct the agent to obey the
 project's own design system — paste them into any coding/asset agent to
 reproduce the same modules elsewhere.

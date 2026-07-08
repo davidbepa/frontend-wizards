@@ -2454,16 +2454,35 @@
 
 /* ── responsive ── */
 @media (max-width: 760px) {
+  /* The floating rig needs room the panels don't get on a phone, so the console
+     shrinks to a centrepiece and the panels move out into the grid below it. */
   .obs-stage {
-    height: clamp(500px, 76svh, 640px);
-  }
-  .holo-card {
-    width: clamp(140px, 42vw, 180px);
-    backdrop-filter: blur(7px) saturate(1.2);
-    -webkit-backdrop-filter: blur(7px) saturate(1.2);
+    height: clamp(360px, 52svh, 480px);
   }
   .obs-reticle {
     width: 58%;
+  }
+  /* Panels flow as a tappable grid of spells (all seven — none dropped) so every
+     module's incantation stays reachable. Static layout: the rAF rig loop skips
+     these (see observatory.js), so CSS owns their position + opacity here. */
+  .obs-field--grid {
+    position: static;
+    inset: auto;
+    perspective: none;
+    pointer-events: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+    margin-top: clamp(0.9rem, 4vw, 1.5rem);
+  }
+  .obs-field--grid .holo-card {
+    position: static;
+    width: auto;
+    transform: none;
+    opacity: 1;
+    will-change: auto;
+    backdrop-filter: blur(7px) saturate(1.2);
+    -webkit-backdrop-filter: blur(7px) saturate(1.2);
   }
 }
 
