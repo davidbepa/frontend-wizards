@@ -1971,9 +1971,15 @@
   --ry: 0px;
   position: relative;
   isolation: isolate;
-  margin: clamp(2rem, 5vw, 3.6rem) auto 0;
-  width: 100%;
-  height: clamp(520px, 82svh, 820px);
+  /* Near-full-bleed: break out of the section's max-width, but keep a horizontal
+     gutter on each side so the corner panels clear the screen edges. Centred with
+     left:50% + a negative margin; body { overflow-x: clip } stops any scrollbar. */
+  --obs-gutter: clamp(1rem, 5vw, 4rem);
+  margin-top: clamp(2rem, 5vw, 3.6rem);
+  left: 50%;
+  width: calc(100vw - 2 * var(--obs-gutter));
+  margin-left: calc(var(--obs-gutter) - 50vw);
+  height: clamp(520px, 92svh, 1080px);
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--border-strong);
@@ -2152,7 +2158,10 @@
 /* ── floating glassmorphism panels ── */
 .obs-field {
   position: absolute;
-  inset: 0;
+  /* Inset the panel field from the stage edges so cards (positioned by x/y
+     fraction, then clipped by the stage's overflow) keep clear of the frame —
+     the bottom-centre Observatory card at y=0.9 especially. */
+  inset: clamp(18px, 5%, 52px) clamp(10px, 2.5%, 40px);
   z-index: 3;
   perspective: 1200px;
   pointer-events: none;
@@ -2457,7 +2466,7 @@
   /* The floating rig needs room the panels don't get on a phone, so the console
      shrinks to a centrepiece and the panels move out into the grid below it. */
   .obs-stage {
-    height: clamp(360px, 52svh, 480px);
+    height: clamp(420px, 66svh, 640px);
   }
   .obs-reticle {
     width: 58%;
