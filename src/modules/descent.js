@@ -22,7 +22,7 @@
 //   • Capability gates: prefers-reduced-motion → a static composite (poster +
 //     punchline, no loop, no video, natural height). No WebGL OR no
 //     mix-blend-mode:screen → the atmosphere canvas is skipped; the DOM scene
-//     stays and the wizard falls back to the static /wizard-falling.png.
+//     stays and the wizard falls back to the static /wizard-falling.webp.
 //   • IntersectionObserver + visibilitychange pause the render loop off-screen
 //     (the video is paused throughout — only its frame is seeked); ResizeObserver
 //     keeps the canvas sized; full teardown disposes
@@ -40,7 +40,7 @@ import {
 const VIDEO_SRC = '/descent.mp4' // the falling background video (user-provided)
 const POSTER_SRC = '/descent-poster.jpg' // reduced-motion / pre-video backdrop
 const WIZARD_VIDEO_SRC = '/wizard-falling.mp4' // the tumbling wizard on green screen
-const WIZARD_SRC = '/wizard-falling.png' // static wizard (reduced-motion / no-WebGL)
+const WIZARD_SRC = '/wizard-falling.webp' // static wizard (reduced-motion / no-WebGL)
 
 const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)')
 const mqCoarse = window.matchMedia('(hover: none), (pointer: coarse)')
