@@ -10,12 +10,12 @@
 }
 
 .section-head {
-  max-width: 52ch;
+  max-width: 88ch;
   margin-bottom: clamp(2.2rem, 5vw, 3.4rem);
 }
 
 .section-head--center {
-  max-width: 56ch;
+  max-width: 92ch;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
@@ -1009,7 +1009,7 @@
 }
 
 .conjure-head {
-  max-width: 56ch;
+  max-width: 92ch;
   margin: 0 auto;
   text-align: center;
 }
@@ -1047,10 +1047,10 @@
   padding-bottom: clamp(2rem, 5vw, 3.5rem);
 }
 
-/* ── left: the render screen ── */
+/* ── right: the render screen ── */
 .conjure-screen {
   position: relative;
-  justify-self: end;
+  justify-self: start;
   max-height: 84vh;
   border-radius: clamp(20px, 3vw, 34px);
   overflow: hidden; /* safe: descendant of the sticky element, not an ancestor */
@@ -1077,9 +1077,9 @@
   opacity: 1;
 }
 
-/* ── right: the simulated prompt window (frosted parchment, like the nav pill) ── */
+/* ── left: the simulated prompt window (frosted parchment, like the nav pill) ── */
 .conjure-window {
-  justify-self: start;
+  justify-self: end;
   width: 100%;
   max-width: 28rem;
   border-radius: var(--radius-lg);
@@ -1268,6 +1268,7 @@
   .conjure-screen {
     justify-self: center;
     max-height: 42svh;
+    order: -1; /* keep the render screen on top; the prompt is first in the DOM */
   }
   .conjure-video {
     max-height: 42svh;
@@ -1285,6 +1286,363 @@
     padding: 0.75rem 0.85rem;
     font-size: 0.9rem;
     line-height: 1.45;
+  }
+}
+
+/* ───────────────────────── The Descent (Lenis scroll-parallax fall) ──────────────────────
+   A full-bleed, pinned fall: a tall .descent-track holds a position:sticky stage
+   (no ancestor may set overflow:hidden — body uses overflow-x:clip for this and
+   the conjure stage). The stage stacks, back→front: a void gradient · the falling
+   video · a depth-scrim that darkens with --p · a WebGL atmosphere canvas screened
+   over the scene · the parallax sigils · the wizard · the beats · the depth rail.
+   --p (0→1, set by JS each frame) deepens the dark and slides the rail. */
+.descent {
+  position: relative;
+  padding: clamp(4rem, 9vw, 7rem) 0 0; /* head only; the stage runs edge-to-edge */
+}
+
+.descent-head {
+  /* The descent section runs edge-to-edge (no padding on .descent), so the head
+     carries its own --pad. Add it back to max-width so the content area is a
+     full 56ch — matching every other module head (box-sizing is border-box). */
+  max-width: calc(92ch + 2 * var(--pad));
+  margin: 0 auto;
+  padding: 0 var(--pad);
+  text-align: center;
+}
+
+.descent-lead {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* A small, on-brand credit line for the 3D/WebGL module. */
+.descent-ack {
+  margin-top: 1.4rem;
+  font-family: var(--font-label);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+  color: var(--text-mute);
+}
+
+.descent-ack a {
+  color: var(--gold);
+  border-bottom: 1px dashed var(--border-strong);
+  transition:
+    color 0.2s var(--ease),
+    border-color 0.2s var(--ease);
+}
+
+.descent-ack a:hover,
+.descent-ack a:focus-visible {
+  color: var(--gold-bright);
+  border-bottom-color: var(--gold-bright);
+}
+
+/* Tall track; the stage pins inside it. Height is set inline by JS (620vh) so
+   reduced-motion can fall back to natural height. */
+.descent-track {
+  position: relative;
+  margin-top: clamp(2rem, 5vw, 3.5rem);
+}
+
+.descent-stage {
+  --p: 0; /* fall progress 0→1, written by JS */
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  isolation: isolate; /* contain the canvas's mix-blend-mode: screen */
+  background:
+    radial-gradient(
+      90% 55% at 50% -8%,
+      rgba(224, 189, 107, 0.16),
+      transparent 60%
+    ),
+    linear-gradient(
+      180deg,
+      var(--surface) 0%,
+      var(--bg) 26%,
+      var(--bg-2) 68%,
+      #081116 100%
+    );
+}
+
+/* Reduced motion: not pinned, natural height, just the poster + the punchline. */
+.descent-stage.is-static {
+  position: static;
+  height: auto;
+  min-height: 86svh;
+  background-size: cover;
+  background-position: center;
+}
+.descent-stage.has-poster {
+  background-color: var(--bg-2);
+}
+
+/* ── the falling background video (behind everything; gradient shows if absent) ── */
+.descent-video {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1s var(--ease);
+  /* warm the footage toward the painterly storybook palette, like the hero */
+  filter: saturate(0.92) contrast(1.03) sepia(0.12) hue-rotate(-6deg);
+}
+.descent-video.is-ready {
+  opacity: 1;
+}
+
+/* ── depth-scrim: a steady vignette + a dark that deepens as you fall ── */
+.descent-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      78% 50% at 50% -4%,
+      rgba(224, 189, 107, calc(0.18 * (1 - var(--p)))),
+      transparent 62%
+    ),
+    radial-gradient(120% 78% at 50% 32%, transparent 38%, rgba(8, 15, 19, 0.55) 100%),
+    linear-gradient(
+      180deg,
+      rgba(15, 28, 34, 0.12) 0%,
+      transparent 26%,
+      rgba(8, 15, 19, calc(0.25 + 0.5 * var(--p))) 100%
+    );
+}
+
+/* ── WebGL atmosphere: god-rays / embers / speed-smears, screened over the scene ── */
+.descent-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mix-blend-mode: screen; /* black adds nothing; the light blooms over the footage */
+  opacity: 0;
+  transition: opacity 0.9s var(--ease);
+}
+.descent-stage.is-live .descent-canvas {
+  opacity: 1;
+}
+
+/* ── parallax sigil strata (the "things appearing") ── */
+.descent-field {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.descent-sigil {
+  position: absolute;
+  top: 50%; /* left is set inline; JS transform streams it up/down past centre */
+  opacity: 0;
+  color: var(--gold-bright);
+  will-change: transform, opacity, filter;
+  text-align: center;
+}
+
+.ds-glyph {
+  display: block;
+}
+.ds-glyph svg {
+  width: clamp(64px, 11vmin, 150px);
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 0 9px rgba(201, 162, 75, 0.55))
+    drop-shadow(0 0 26px rgba(216, 132, 63, 0.32));
+}
+
+.ds-label {
+  display: block;
+  margin-top: 0.7em;
+  font-family: var(--font-label);
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: var(--gold-bright);
+  white-space: nowrap;
+  text-shadow: 0 0 14px rgba(201, 162, 75, 0.6);
+}
+
+/* ── the falling wizard ── */
+.descent-wizard {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  height: clamp(300px, 58vh, 720px);
+  width: auto;
+  transform: translate(-50%, -50%); /* JS layers the tumble on top */
+  transform-origin: center;
+  opacity: 0;
+  transition: opacity 1s var(--ease);
+  will-change: transform, opacity;
+  filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 36px rgba(201, 162, 75, 0.35));
+  pointer-events: none;
+}
+.descent-stage.is-live .descent-wizard {
+  opacity: 1;
+}
+
+/* The green-screen clip variant: a 16:9 canvas keyed to transparency. The subject
+   fills ~80% of the frame height, so it's sized taller than the tight PNG to land
+   the wizard at a matching on-screen size; the box runs wider than the viewport
+   but the stage clips it. It fades in only once the footage is keyed & painted
+   (JS adds .is-ready), so no black rectangle ever flashes. */
+.descent-wizard--video {
+  display: block;
+  aspect-ratio: 1280 / 720;
+  height: clamp(340px, 72vh, 900px);
+  width: auto;
+  /* one lighter shadow — this canvas repaints every frame with the scrub */
+  filter: drop-shadow(0 22px 46px rgba(0, 0, 0, 0.55));
+}
+.descent-stage.is-live .descent-wizard--video {
+  opacity: 0;
+}
+.descent-stage.is-live .descent-wizard--video.is-ready {
+  opacity: 1;
+}
+
+/* ── story beats (centred narration band) ── */
+.descent-beats {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.descent-beat {
+  position: absolute;
+  left: 50%;
+  top: 80%;
+  width: min(90%, 42ch);
+  margin: 0;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.3rem, 3.2vw, 2.1rem);
+  line-height: 1.18;
+  color: var(--text);
+  opacity: 0;
+  text-shadow:
+    0 2px 24px rgba(0, 0, 0, 0.8),
+    0 0 40px rgba(8, 15, 19, 0.7);
+  will-change: transform, opacity;
+}
+.descent-beat--big {
+  font-size: clamp(1.7rem, 5vw, 3.2rem);
+  font-weight: 800;
+}
+.descent-beat.is-static {
+  position: absolute;
+  top: 50%;
+  opacity: 1;
+}
+
+/* ── depth rail (a quiet "how far you've fallen" gauge) ── */
+.descent-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: clamp(12px, 2.4vw, 30px);
+  width: 1px;
+  z-index: 6;
+  pointer-events: none;
+}
+.dr-line {
+  position: absolute;
+  top: 8%;
+  bottom: 8%;
+  right: 0;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--border-strong) 12%,
+    var(--border-strong) 88%,
+    transparent
+  );
+}
+.dr-bead {
+  position: absolute;
+  right: -3.5px;
+  top: 8%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold-bright);
+  box-shadow: 0 0 12px rgba(224, 189, 107, 0.9);
+  transform: translateY(-50%);
+}
+.dr-depth {
+  position: absolute;
+  right: 15px;
+  top: 8%;
+  transform: translateY(-50%);
+  font-family: var(--font-label);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  color: var(--gold-bright);
+  white-space: nowrap;
+  text-shadow: 0 0 12px rgba(201, 162, 75, 0.6);
+}
+
+/* visually-hidden scene description for screen readers */
+.descent-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* phones: a smaller wizard + glyphs, hide the rail to keep the fall clean */
+@media (max-width: 600px) {
+  .descent-wizard {
+    height: clamp(220px, 44vh, 440px);
+  }
+  /* the 16:9 keyed clip needs more height for the subject to read at phone size */
+  .descent-wizard--video {
+    height: clamp(280px, 54vh, 520px);
+  }
+  .ds-glyph svg {
+    width: clamp(54px, 16vw, 110px);
+  }
+  .descent-rail {
+    display: none;
+  }
+  .descent-beat {
+    top: 82%;
+  }
+}
+
+/* pre-JS / no-JS safety under reduced motion: never show a black canvas */
+@media (prefers-reduced-motion: reduce) {
+  .descent-canvas,
+  .descent-video {
+    display: none;
   }
 }
 
@@ -1702,4 +2060,489 @@
   font-size: 0.95rem;
   line-height: 1.55;
   color: var(--text-dim);
+}
+
+/* ═══════════════════ The Observatory (holographic console) ═══════════════════
+   A dark holographic viewport (.obs-stage). Stacked back→front: a CSS void +
+   soft core glow · a three.js canvas (particle core / starfield / nebula / orrery
+   rings, additive light on a transparent canvas) · an arcane frame (corner sigils,
+   a slow rune-circle, an incantation) · floating glassmorphism panels whose
+   backdrop-filter frosts the canvas behind them. JS eases a pointer target and an
+   "assemble" value and writes every panel transform + a few CSS vars each frame;
+   reduced-motion falls to a settled composite. The scoped --holo-* tokens warm the
+   "Arcane Academy" palette to candlelit gold, ember and moonlit-violet. */
+.observatory {
+  --holo-gold: #f4d488; /* candlelight gold (primary) */
+  --holo-ember: #e9995a; /* ember (warm secondary) */
+  --holo-arc: #c3b0ef; /* moonlit arcane violet (accent) */
+  --holo-line: rgba(244, 212, 136, 0.4);
+  text-align: center;
+}
+.observatory .section-lead {
+  margin-inline: auto;
+}
+
+/* ── the holographic viewport ── */
+.obs-stage {
+  --energy: 0; /* 0..1, written by JS */
+  --rx: 0px; /* pointer-driven HUD/core shift */
+  --ry: 0px;
+  position: relative;
+  isolation: isolate;
+  margin: clamp(2rem, 5vw, 3.6rem) auto 0;
+  width: 100%;
+  height: clamp(520px, 82svh, 820px);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  background:
+    radial-gradient(
+      120% 90% at 50% 8%,
+      rgba(224, 189, 107, 0.14),
+      transparent 55%
+    ),
+    radial-gradient(90% 120% at 50% 120%, rgba(216, 132, 63, 0.12), transparent 60%),
+    linear-gradient(180deg, #14100e 0%, #0d0a0f 52%, #08060a 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(244, 212, 136, 0.14),
+    inset 0 0 90px rgba(8, 6, 10, 0.9),
+    var(--glow-gold);
+}
+.obs-stage.is-live {
+  animation: obs-in 1.2s var(--ease) both;
+}
+@keyframes obs-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── base core glow (always on; carries the scene with no WebGL) ── */
+.obs-core {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transform: translate(calc(var(--rx) * 0.5), calc(var(--ry) * 0.5));
+}
+.obs-core-orb {
+  position: absolute;
+  width: min(46%, 460px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 46%,
+    rgba(255, 248, 224, calc(0.55 + 0.4 * var(--energy))) 0%,
+    var(--holo-gold) 18%,
+    rgba(233, 153, 90, 0.5) 40%,
+    rgba(195, 176, 239, 0.22) 62%,
+    transparent 76%
+  );
+  filter: blur(14px);
+  opacity: calc(0.5 + 0.5 * var(--energy));
+  animation: obs-breathe 7s var(--ease) infinite;
+}
+.obs-core-ring {
+  position: absolute;
+  width: min(52%, 520px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    var(--holo-gold) 55deg,
+    transparent 115deg,
+    var(--holo-ember) 190deg,
+    transparent 250deg,
+    var(--holo-arc) 320deg,
+    transparent 360deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 61%, #000 62%, #000 66%, transparent 67%);
+  mask: radial-gradient(circle, transparent 61%, #000 62%, #000 66%, transparent 67%);
+  opacity: calc(0.35 + 0.4 * var(--energy));
+  animation: obs-spin 26s linear infinite;
+}
+.obs-stage.no-gl .obs-core-orb {
+  filter: blur(10px);
+  opacity: calc(0.7 + 0.3 * var(--energy));
+}
+@keyframes obs-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+@keyframes obs-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── the WebGL canvas (additive light on transparent) ── */
+.obs-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.1s var(--ease);
+}
+.obs-stage.is-live .obs-canvas {
+  opacity: 1;
+}
+
+/* ── arcane frame: corner sigils · rune-circle · incantation ── */
+.obs-hud {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  color: var(--holo-gold);
+}
+.obs-corner {
+  position: absolute;
+  font-size: 0.85rem;
+  line-height: 1;
+  color: var(--holo-gold);
+  opacity: 0.5;
+  text-shadow: 0 0 8px rgba(244, 212, 136, 0.6);
+}
+.obs-corner--tl { top: 16px; left: 18px; }
+.obs-corner--tr { top: 16px; right: 18px; }
+.obs-corner--bl { bottom: 16px; left: 18px; }
+.obs-corner--br { bottom: 16px; right: 18px; }
+.obs-reticle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(46%, 440px);
+  aspect-ratio: 1;
+  color: var(--holo-gold);
+  opacity: calc(0.3 + 0.32 * var(--energy));
+  transform: translate(-50%, -50%) translate(var(--rx), var(--ry));
+}
+.obs-reticle svg {
+  width: 100%;
+  height: 100%;
+  animation: obs-spin 60s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(244, 212, 136, 0.5));
+}
+.obs-status {
+  position: absolute;
+  left: 24px;
+  bottom: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  color: var(--text-dim);
+}
+.obs-star {
+  color: var(--holo-gold);
+  font-style: normal;
+  text-shadow: 0 0 9px rgba(244, 212, 136, 0.7);
+  animation: obs-blink 3.2s var(--ease) infinite;
+}
+@keyframes obs-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ── floating glassmorphism panels ── */
+.obs-field {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  perspective: 1200px;
+  pointer-events: none;
+}
+.holo-card {
+  --depth: 0.7;
+  position: absolute;
+  width: clamp(150px, 15.5vw, 208px);
+  padding: 0.85rem 0.95rem 0.9rem;
+  text-align: left;
+  border-radius: 14px;
+  color: var(--text);
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+  transform-origin: center;
+  will-change: transform, opacity;
+  overflow: hidden;
+  background: linear-gradient(
+    158deg,
+    rgba(45, 72, 82, 0.5) 0%,
+    rgba(15, 28, 34, 0.34) 100%
+  );
+  border: 1px solid rgba(244, 212, 136, 0.24);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 22px rgba(244, 212, 136, 0.05),
+    0 24px 60px -24px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(9px) saturate(1.35);
+  -webkit-backdrop-filter: blur(9px) saturate(1.35);
+  transition:
+    scale 0.32s var(--ease),
+    border-color 0.32s var(--ease),
+    box-shadow 0.32s var(--ease),
+    filter 0.32s var(--ease);
+}
+@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+  .holo-card {
+    background: linear-gradient(158deg, rgba(29, 49, 56, 0.9), rgba(12, 24, 29, 0.86));
+  }
+}
+/* neon hairline along the top edge */
+.holo-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--holo-gold), transparent);
+  opacity: 0.8;
+}
+/* a diagonal holographic sheen that drifts across the glass */
+.hc-scan {
+  position: absolute;
+  inset: -40% -10%;
+  background: linear-gradient(
+    115deg,
+    transparent 42%,
+    rgba(255, 244, 214, 0.12) 49%,
+    rgba(244, 212, 136, 0.12) 52%,
+    transparent 60%
+  );
+  transform: translateX(-30%);
+  animation: hc-sheen calc(6s + var(--i, 0) * 0.7s) linear infinite;
+  pointer-events: none;
+}
+@keyframes hc-sheen {
+  to {
+    transform: translateX(30%);
+  }
+}
+.holo-card:hover,
+.holo-card:focus-within {
+  scale: 1.06;
+  border-color: rgba(244, 212, 136, 0.7);
+  filter: brightness(1.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 0 30px rgba(244, 212, 136, 0.12),
+    0 30px 70px -22px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(244, 212, 136, 0.4),
+    0 0 42px -6px rgba(244, 212, 136, 0.45);
+}
+
+.hc-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.6rem;
+}
+.hc-glyph {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 0.98rem;
+  color: var(--holo-gold);
+  background: rgba(244, 212, 136, 0.1);
+  border: 1px solid rgba(244, 212, 136, 0.32);
+  text-shadow: 0 0 10px rgba(244, 212, 136, 0.7);
+}
+.hc-titles {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0;
+}
+.hc-label {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 0.86rem;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+.hc-sub {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.74rem;
+  color: var(--holo-gold);
+}
+.hc-readout {
+  font-family: var(--font-label);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.58rem;
+  color: var(--text-mute);
+  margin-bottom: 0.6rem;
+}
+.hc-readout em {
+  font-style: normal;
+  color: var(--holo-gold);
+}
+.hc-key {
+  color: var(--text-dim);
+}
+
+/* ── tiny live readouts ── */
+.hc-viz {
+  height: 20px;
+  display: flex;
+  align-items: flex-end;
+}
+/* a shooting-star comet streak */
+.hc-comet {
+  position: relative;
+  width: 100%;
+  height: 10px;
+  overflow: hidden;
+}
+.hc-comet::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 46%;
+  height: 2px;
+  margin-top: -1px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--holo-gold));
+  box-shadow: 0 0 9px var(--holo-gold);
+  animation: hc-comet 2.8s var(--ease) infinite;
+}
+@keyframes hc-comet {
+  from { transform: translateX(-130%); }
+  to { transform: translateX(320%); }
+}
+/* a twinkling constellation */
+.hc-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 100%;
+}
+.hc-stars i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff, var(--holo-gold) 62%, transparent 74%);
+  box-shadow: 0 0 6px var(--holo-gold);
+  animation: hc-twinkle 2.4s var(--ease) infinite;
+}
+.hc-stars i:nth-child(2) { animation-delay: 0.5s; scale: 0.7; }
+.hc-stars i:nth-child(3) { animation-delay: 1s; }
+.hc-stars i:nth-child(4) { animation-delay: 0.25s; scale: 0.8; }
+.hc-stars i:nth-child(5) { animation-delay: 1.3s; scale: 0.6; }
+@keyframes hc-twinkle {
+  0%,
+  100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+/* an orbiting moon */
+.hc-moon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px dashed rgba(244, 212, 136, 0.35);
+}
+.hc-moon i {
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff, var(--holo-gold) 70%);
+  box-shadow: 0 0 8px var(--holo-gold);
+  transform-origin: 3px 13px;
+  animation: obs-spin 4.5s linear infinite;
+}
+/* flickering embers */
+.hc-embers {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.hc-embers i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe6b0, var(--holo-ember) 64%, transparent 78%);
+  box-shadow: 0 0 8px var(--holo-ember);
+  animation: hc-ember 2s var(--ease) infinite;
+}
+.hc-embers i:nth-child(2) { animation-delay: 0.35s; }
+.hc-embers i:nth-child(3) { animation-delay: 0.7s; }
+@keyframes hc-ember {
+  0%,
+  100% { opacity: 0.3; transform: translateY(1px) scale(0.85); }
+  50% { opacity: 1; transform: translateY(-1px) scale(1); }
+}
+
+.obs-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── reduced motion: a settled, readable composite ── */
+.obs-stage.is-static {
+  animation: none;
+}
+.obs-stage.is-static .obs-core-orb,
+.obs-stage.is-static .obs-core-ring,
+.obs-stage.is-static .obs-reticle svg,
+.obs-stage.is-static .hc-scan,
+.obs-stage.is-static .obs-star {
+  animation: none;
+}
+.obs-stage.is-static .obs-core {
+  --energy: 0.65;
+}
+
+/* ── responsive ── */
+@media (max-width: 760px) {
+  .obs-stage {
+    height: clamp(500px, 76svh, 640px);
+  }
+  .holo-card {
+    width: clamp(140px, 42vw, 180px);
+    backdrop-filter: blur(7px) saturate(1.2);
+    -webkit-backdrop-filter: blur(7px) saturate(1.2);
+  }
+  .obs-reticle {
+    width: 58%;
+  }
 }

@@ -2,12 +2,15 @@ import './styles/base.css'
 import './styles/sections.css'
 
 import { pillars, spells, stats, stack, grimoire, ladder, sources, work } from './data.js'
+import { initSmoothScroll } from './modules/smoothScroll.js'
 import { initScroll } from './modules/scroll.js'
 import { initCounters } from './modules/counters.js'
 import { initHeroVideo } from './modules/heroVideo.js'
 import { initConjure } from './modules/conjure.js'
+import { initDescent } from './modules/descent.js'
 import { initTrueForm } from './modules/trueForm.js'
 import { initIceWall } from './modules/iceWall.js'
+import { initObservatory } from './modules/observatory.js'
 import { initArcade } from './modules/arcade.js'
 import { initReveal } from './modules/reveal.js'
 
@@ -146,12 +149,15 @@ function boot() {
   initReveal() // build the grimoire before initScroll so its .reveal cards are observed
 
   // Effects (each guards prefers-reduced-motion / capability internally)
+  initSmoothScroll() // global Lenis eased scroll — drives the descent's fall feel
   initScroll()
   initCounters()
   initHeroVideo()
   initConjure()
+  initDescent()
   initTrueForm()
   initIceWall()
+  initObservatory()
   initArcade()
 }
 

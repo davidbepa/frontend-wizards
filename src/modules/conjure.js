@@ -76,7 +76,7 @@ function build(mount) {
   const stage = document.createElement('div')
   stage.className = 'conjure-stage' + (reduce ? ' is-static' : '')
 
-  // Left: the render screen (video in its native portrait aspect).
+  // Right: the render screen (video in its native portrait aspect).
   const screen = document.createElement('div')
   screen.className = 'conjure-screen'
   const video = document.createElement('video')
@@ -89,10 +89,19 @@ function build(mount) {
   video.preload = 'auto'
   video.tabIndex = -1
   video.setAttribute('aria-label', STR.aria)
-  video.src = VIDEO_SRC
   screen.appendChild(video)
 
-  // Right: the simulated prompt window.
+  // Deferred load: the multi-MB src is attached only when the section nears the
+  // viewport (see the IntersectionObserver) — or immediately on the reduced-motion
+  // still path — so it never downloads alongside the hero on first paint.
+  let srcSet = false
+  const loadVideo = () => {
+    if (srcSet) return
+    srcSet = true
+    video.src = VIDEO_SRC
+  }
+
+  // Left: the simulated prompt window.
   const win = document.createElement('div')
   win.className = 'conjure-window'
   win.innerHTML = `
@@ -107,8 +116,9 @@ function build(mount) {
     </div>
     <div class="cw-foot"></div>`
 
-  stage.appendChild(screen)
+  // Prompt on the left, render screen on the right — grid auto-places in DOM order.
   stage.appendChild(win)
+  stage.appendChild(screen)
   track.appendChild(stage)
   mount.appendChild(track)
 
@@ -143,6 +153,7 @@ function build(mount) {
 
   // ── Reduced motion: static final state, no loop ─────────────────────────────
   if (reduce) {
+    loadVideo() // the still needs a decoded frame, so fetch it right away
     setTyped(PROMPT_TEXT.length)
     setPhase('done')
     const park = () => {
@@ -233,11 +244,12 @@ function build(mount) {
     (entries) => {
       inView = entries[0].isIntersecting
       if (inView) {
+        loadVideo()
         measure()
         startLoop()
       }
     },
-    { rootMargin: '256px 0px' }
+    { rootMargin: '600px 0px' } // start fetching the clip a little before it pins
   )
   io.observe(track)
 

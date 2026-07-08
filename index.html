@@ -44,7 +44,9 @@
         <div class="nav-links">
           <a href="#true-form">True form</a>
           <a href="#conjure">Conjure</a>
+          <a href="#descent">Descend</a>
           <a href="#ice-wall">The wall</a>
+          <a href="#observatory">Console</a>
           <a href="#arcade">Arcade</a>
         </div>
         <a
@@ -169,6 +171,39 @@
         <div class="conjure-mount" data-conjure></div>
       </section>
 
+      <!-- ──────────── The Descent (Lenis scroll-parallax fall) ────────────
+           After you learn to cast, the order pulls you DOWN. A tall track with a
+           position:sticky full-viewport stage pins while you fall: a user-supplied
+           falling video behind, a tumbling wizard, glowing sigils of the craft
+           rising and rushing past, and a WebGL atmosphere (god-rays, embers,
+           speed-smears) screened over the top. One scroll progress drives every
+           layer; the Lenis-eased scroll velocity stretches the dust into streaks.
+           Reduced-motion / no-WebGL fall back gracefully. See src/modules/descent.js.
+           NOTE: drop the falling background video at /public/descent.mp4. -->
+      <section class="descent" id="descent" aria-labelledby="descent-title">
+        <div class="descent-head">
+          <p class="kicker">The descent</p>
+          <h2 class="section-title" id="descent-title">
+            Fall through the <em>craft</em>
+          </h2>
+          <p class="section-lead descent-lead">
+            Casting is only the surface. Beneath it runs everything the craft is
+            built on — the runes you already speak, the components, the patterns,
+            the systems that once took years to learn. With an agent at your side
+            you don't climb that learning curve. Scroll, and you'll feel it: you
+            fall through it — and the order opens beneath you.
+          </p>
+          <p class="descent-ack">
+            Atmosphere conjured in
+            <a href="https://threejs.org" target="_blank" rel="noopener"
+              >three.js</a
+            >
+            · WebGL — god-rays, embers and the fall, summoned by an agent.
+          </p>
+        </div>
+        <div class="descent-mount" data-descent></div>
+      </section>
+
       <!-- ──────────── Behind the Wall (WebGL — monster frozen in ice) ────────────
            A perspective-tilting pane of ice with a looping creature behind it (the
            chaos every codebase keeps frozen out: legacy bugs, race conditions).
@@ -212,6 +247,38 @@
             the cursor moves, and it presses against the glass from the other side.
           </p>
         </div>
+      </section>
+
+      <!-- ──────────── The Observatory (WebGL — holographic arcane console) ────────────
+           An immersive sci-fi console floating in a dark void: a fluid three.js
+           particle core orbited by a starfield, a nebula and thin orrery rings
+           (additive light on a transparent canvas), framed by a HUD and surrounded
+           by floating glassmorphism panels — one per discipline of the craft. Move
+           the cursor and the whole rig banks like a camera; the panels parallax at
+           their own depths; scroll and the scattered console assembles and the core
+           ignites. Reduced-motion → a settled composite; no-WebGL → the CSS core +
+           DOM parallax still read. See src/modules/observatory.js. -->
+      <section
+        class="section observatory"
+        id="observatory"
+        aria-labelledby="observatory-title"
+      >
+        <div class="section-head section-head--center">
+          <p class="kicker">The observatory</p>
+          <h2 class="section-title" id="observatory-title">
+            Command the whole craft<br />from a <em>holographic</em> console
+          </h2>
+          <p class="section-lead">
+            Every discipline you just fell through — rendering, shaders, motion,
+            state, systems, interface — now hovers before you as a pane of light,
+            orbiting a living particle core. This is the wizard's observatory: an
+            abstract WebGL void you can reach into. Move your cursor and the whole
+            rig banks like a camera; the sigils drift at their own depths. With an
+            agent at the helm, the entire craft is laid out at arm's reach —
+            luminous, reachable, yours to command.
+          </p>
+        </div>
+        <div class="obs-mount" data-observatory></div>
       </section>
 
       <!-- ──────────────── Debug the Dungeon (Pac-style mini-game) ────────────────
