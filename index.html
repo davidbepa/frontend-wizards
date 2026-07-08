@@ -46,8 +46,8 @@
           <a href="#conjure">Conjure</a>
           <a href="#descent">Descend</a>
           <a href="#ice-wall">The wall</a>
-          <a href="#observatory">Console</a>
           <a href="#arcade">Arcade</a>
+          <a href="#observatory">The reveal</a>
         </div>
         <a
           class="btn btn-primary btn-sm nav-cta"
@@ -249,38 +249,6 @@
         </div>
       </section>
 
-      <!-- ──────────── The Observatory (WebGL — holographic arcane console) ────────────
-           An immersive sci-fi console floating in a dark void: a fluid three.js
-           particle core orbited by a starfield, a nebula and thin orrery rings
-           (additive light on a transparent canvas), framed by a HUD and surrounded
-           by floating glassmorphism panels — one per discipline of the craft. Move
-           the cursor and the whole rig banks like a camera; the panels parallax at
-           their own depths; scroll and the scattered console assembles and the core
-           ignites. Reduced-motion → a settled composite; no-WebGL → the CSS core +
-           DOM parallax still read. See src/modules/observatory.js. -->
-      <section
-        class="section observatory"
-        id="observatory"
-        aria-labelledby="observatory-title"
-      >
-        <div class="section-head section-head--center">
-          <p class="kicker">The observatory</p>
-          <h2 class="section-title" id="observatory-title">
-            Command the whole craft<br />from a <em>holographic</em> console
-          </h2>
-          <p class="section-lead">
-            Every discipline you just fell through — rendering, shaders, motion,
-            state, systems, interface — now hovers before you as a pane of light,
-            orbiting a living particle core. This is the wizard's observatory: an
-            abstract WebGL void you can reach into. Move your cursor and the whole
-            rig banks like a camera; the sigils drift at their own depths. With an
-            agent at the helm, the entire craft is laid out at arm's reach —
-            luminous, reachable, yours to command.
-          </p>
-        </div>
-        <div class="obs-mount" data-observatory></div>
-      </section>
-
       <!-- ──────────────── Debug the Dungeon (Pac-style mini-game) ────────────────
            A reskinned Pac-Man: a wizard-developer outruns four bugs through a
            grimoire-maze. Phaser 3 is lazy-loaded only when the player hits Play
@@ -307,26 +275,38 @@
         </div>
       </section>
 
-      <!-- ──────────────── The Reveal (the grimoire) ────────────────
-           Hands the visitor the spellbook: the generic, design-system-aware
-           prompts that conjured every module above — build prompts plus the
-           prompts for the art each one needs. Rendered by src/modules/reveal.js
-           into [data-spellbook]. -->
-      <section class="section outro" id="reveal" aria-labelledby="outro-title">
+      <!-- ──────────── The Observatory / The Reveal (WebGL — holographic console) ──────
+           The finale, and the reveal. An immersive sci-fi console floating in a dark
+           void: a fluid three.js particle core orbited by a starfield, a nebula and
+           thin orrery rings (additive light on a transparent canvas), framed by a HUD
+           and surrounded by floating glassmorphism panels — one per MODULE on the
+           page. Move the cursor and the whole rig banks like a camera; the panels
+           parallax at their own depths; scroll and the scattered console assembles and
+           the core ignites. Touch a panel and a modal opens with the exact
+           incantation(s) that summoned that module (prompts live in
+           src/modules/spellbook.js). Reduced-motion → a settled composite; no-WebGL →
+           the CSS core + DOM parallax still read. See src/modules/observatory.js. -->
+      <section
+        class="section observatory"
+        id="observatory"
+        aria-labelledby="observatory-title"
+      >
         <div class="section-head section-head--center">
           <p class="kicker">The reveal</p>
-          <h2 class="section-title reveal" id="outro-title">
-            The spell was always yours.<br />Now you have the <em>words</em>.
+          <h2 class="section-title" id="observatory-title">
+            Every module was a <em>sentence</em>.<br />Here are the words.
           </h2>
-          <p class="section-lead reveal">
-            Every section you scrolled was conjured by an agent from a single
-            incantation. Here is the grimoire — the exact prompts that summoned
-            each module and rendered its art. They're generic by design: hand
-            them to any agent, point it at your own design system, and the same
-            magic appears on your site.
+          <p class="section-lead">
+            This is the wizard's observatory: every section you just scrolled now
+            hovers before you as a pane of light, orbiting a living particle core.
+            Move your cursor and the whole rig banks like a camera; the sigils drift
+            at their own depths. Reach out and touch one — its incantation unfurls:
+            the exact, design-system-aware prompt an agent turned into that module.
+            They're generic by design. Hand them to any agent, point it at your own
+            site, and the same magic appears.
           </p>
         </div>
-        <div class="grimoire" data-spellbook></div>
+        <div class="obs-mount" data-observatory></div>
       </section>
     </main>
 

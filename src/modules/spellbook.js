@@ -1,26 +1,26 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// The Reveal — the grimoire.
+// The Spellbook — the prompt catalogue.
 //
-// The closing beat hands the visitor the spellbook: for every module on the page
-// it shows the generic build prompt that conjured it, plus the prompts that
-// generated its art (images / video). Every prompt is portable — it uses
-// {{PLACEHOLDERS}} for brand specifics and tells the agent to obey the project's
-// own design system — so a reader can paste them into any agent and summon the
-// same modules on their own site.
+// The generic build prompt that conjured every module on the page, plus the
+// prompts that generated its art (images / video). Every prompt is portable — it
+// uses {{PLACEHOLDERS}} for brand specifics and tells the agent to obey the
+// project's own design system — so a reader can paste them into any agent and
+// summon the same modules on their own site.
 //
 // Prompts are deliberately precise: exact libraries, constants, timings and
 // function-level behaviour, so a coding/asset agent can rebuild faithfully.
 //
-// Pure DOM + clipboard. No WebGL, no scroll loop. Cards reveal via the shared
-// .reveal observer (scroll.js); copy buttons use the async Clipboard API with a
-// graceful execCommand fallback.
+// This is pure data. The Observatory (src/modules/observatory.js) surfaces it:
+// each floating panel is one entry, and touching it opens a modal with the
+// incantation(s) below.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Each entry mirrors one module in the scroll. `build` is the coding incantation;
-// `assets` are the image/video generation prompts that module needs (if any).
-// `kind` drives the tag colour: 'build' | 'image' | 'video'. Text uses backticks
-// so the embedded code literals ('webgl2', 'lighter', …) need no escaping.
-const GRIMOIRE = [
+// Each entry mirrors one module in the scroll, IN PAGE ORDER (the Observatory
+// zips this list against its panel layout by index). `build` is the coding
+// incantation; `assets` are the image/video generation prompts that module needs
+// (if any). `kind` drives the tag colour: 'build' | 'image' | 'video'. Text uses
+// backticks so the embedded code literals ('webgl2', 'lighter', …) need no escaping.
+export const SPELLBOOK = [
   {
     name: 'Hero',
     summary: 'Full-bleed looping background video behind a headline, subhead and CTAs.',
@@ -164,102 +164,7 @@ const GRIMOIRE = [
   },
 ]
 
-const COPIED_MS = 1600
-
-// Copy `text` to the clipboard; resolve true on success. Falls back to a hidden
-// textarea + execCommand where the async API is unavailable (older / insecure ctx).
-async function copyText(text) {
-  try {
-    if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(text)
-      return true
-    }
-  } catch {
-    /* fall through to the legacy path */
-  }
-  try {
-    const ta = document.createElement('textarea')
-    ta.value = text
-    ta.setAttribute('readonly', '')
-    ta.style.position = 'fixed'
-    ta.style.opacity = '0'
-    ta.style.pointerEvents = 'none'
-    document.body.appendChild(ta)
-    ta.select()
-    const ok = document.execCommand('copy')
-    document.body.removeChild(ta)
-    return ok
-  } catch {
-    return false
-  }
-}
-
-// Build one prompt block (tag + copy button + the prompt text).
-function promptBlock(prompt) {
-  const block = document.createElement('div')
-  block.className = 'gc-prompt'
-  block.innerHTML = `
-    <div class="gc-prompt-head">
-      <span class="gc-tag gc-tag--${prompt.kind}">${prompt.label}</span>
-      <button class="gc-copy" type="button" data-copy aria-label="Copy this prompt">
-        <span class="gc-copy-label">Copy</span>
-      </button>
-    </div>
-    <p class="gc-text"></p>`
-  // Set as textContent so quotes/braces are never parsed as HTML.
-  block.querySelector('.gc-text').textContent = prompt.text
-  return block
-}
-
-function renderCard(entry) {
-  // <details> gives accessible, keyboard-friendly collapse with zero JS.
-  const card = document.createElement('details')
-  card.className = 'grimoire-card reveal'
-  card.innerHTML = `
-    <summary class="gc-head">
-      <span class="gc-heading">
-        <h3 class="gc-name">${entry.name}</h3>
-        <span class="gc-summary">${entry.summary}</span>
-      </span>
-      <span class="gc-toggle" aria-hidden="true"></span>
-    </summary>
-    <div class="gc-prompts"></div>`
-
-  const prompts = card.querySelector('.gc-prompts')
-  prompts.appendChild(promptBlock(entry.build))
-  entry.assets.forEach((a) => prompts.appendChild(promptBlock(a)))
-  return card
-}
-
-export function initReveal() {
-  const mount = document.querySelector('[data-spellbook]')
-  if (!mount) return
-
-  const grid = document.createElement('div')
-  grid.className = 'grimoire-grid'
-  GRIMOIRE.forEach((entry) => grid.appendChild(renderCard(entry)))
-  mount.appendChild(grid)
-
-  // One delegated click handler for every copy button.
-  const timers = new WeakMap()
-  grid.addEventListener('click', async (e) => {
-    const btn = e.target.closest('[data-copy]')
-    if (!btn) return
-    const text = btn.closest('.gc-prompt')?.querySelector('.gc-text')?.textContent
-    if (!text) return
-
-    const ok = await copyText(text)
-    const label = btn.querySelector('.gc-copy-label')
-    if (label) label.textContent = ok ? 'Copied ✓' : 'Press ⌘C'
-    btn.classList.toggle('is-copied', ok)
-
-    clearTimeout(timers.get(btn))
-    timers.set(
-      btn,
-      setTimeout(() => {
-        if (label) label.textContent = 'Copy'
-        btn.classList.remove('is-copied')
-      }, COPIED_MS)
-    )
-  })
+// Flatten one entry to an ordered list of prompt blocks (build first, then art).
+export function entryPrompts(entry) {
+  return [entry.build, ...entry.assets]
 }

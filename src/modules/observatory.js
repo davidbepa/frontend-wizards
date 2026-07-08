@@ -1,13 +1,16 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// The Observatory — a holographic arcane console.
+// The Observatory — a holographic arcane console AND the reveal.
 //
-// The story beat after warding the monster: the wizard steps up to the console.
-// Every discipline of the craft — rendering, shaders, motion, state, systems,
-// interface — hovers before them as a pane of light, orbiting a fluid particle
-// core in an abstract WebGL void. Move the cursor and the whole rig banks like a
+// The closing beat: the wizard steps up to the console and every module they just
+// scrolled hovers before them as a pane of light, orbiting a fluid particle core
+// in an abstract WebGL void. Move the cursor and the whole rig banks like a
 // camera; the glass panels drift at their own depths (parallax); scroll and the
-// scattered console assembles into formation and the core ignites. The lesson in
-// the page's key: with an agent, the entire craft is laid out at arm's reach.
+// scattered console assembles into formation and the core ignites.
+//
+// Each panel is one section of the page (see PANELS/MODULES + SPELLBOOK). Touch a
+// panel and a modal opens with the exact incantation(s) that summoned it — the
+// generic, design-system-aware build prompt plus the prompts for its art. This is
+// the grimoire, handed over: proof that the whole page was conjured from sentences.
 //
 // How it's built (mirrors conjure.js / descent.js / iceWall.js conventions):
 //   • A normal .section (not pinned) holding an .obs-stage — a dark holographic
@@ -36,6 +39,7 @@ import {
   dustVertex,
   dustFragment,
 } from './gl/observatoryShaders.js'
+import { SPELLBOOK, entryPrompts } from './spellbook.js'
 
 const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)')
 const mqCoarse = window.matchMedia('(hover: none), (pointer: coarse)')
@@ -44,42 +48,55 @@ const mqNarrow = window.matchMedia('(max-width: 760px)')
 const clamp = (n, lo, hi) => (n < lo ? lo : n > hi ? hi : n)
 const lerp = (a, b, t) => a + (b - a) * t
 
-// ── The instrument panels — one per discipline of the craft ──────────────────
-// x/y are the panel centre as a fraction of the stage; depth (0..1) drives the
-// parallax throw, scale and blur (near = 1, moves most; far = small, hazier).
-// viz picks the little live readout drawn in CSS. `narrow` hides a panel on phones.
+// ── The instrument panels — one per module in the scroll ─────────────────────
+// Each panel IS one section of the page; touching it opens the modal with the
+// exact incantation(s) that summoned it. The list is IN PAGE ORDER and zipped
+// against SPELLBOOK by index (MODULES, below). x/y are the panel centre as a
+// fraction of the stage; depth (0..1) drives the parallax throw, scale and blur
+// (near = 1, moves most; far = small, hazier). `readout`/`metric` is the little
+// console line; viz picks the live readout drawn in CSS. `narrow` hides a panel
+// on phones, leaving a clean four-corner set (Hero · True Form · Wall · Arcade).
 const PANELS = [
   {
-    glyph: '❋', label: 'Rendering', sub: 'The Loom',
-    readout: 'painting at', metric: '60fps', viz: 'comet',
-    x: 0.15, y: 0.24, depth: 0.92,
+    glyph: '✦', label: 'Hero', sub: 'The Summons',
+    readout: 'looping', metric: 'video', viz: 'comet',
+    x: 0.16, y: 0.2, depth: 0.92,
   },
   {
-    glyph: '✴', label: 'Shaders', sub: 'The Light',
-    readout: 'GLSL', metric: 'by hand', viz: 'stars',
-    x: 0.85, y: 0.2, depth: 0.86,
+    glyph: '❋', label: 'True Form', sub: 'The X-Ray',
+    readout: 'WebGL', metric: 'reveal', viz: 'stars',
+    x: 0.84, y: 0.19, depth: 0.86,
   },
   {
-    glyph: '☽', label: 'Motion', sub: 'The Tide',
-    readout: 'eased', metric: 'alive', viz: 'moon',
-    x: 0.13, y: 0.63, depth: 0.72, narrow: true,
+    glyph: '☽', label: 'Conjuring', sub: 'The Render',
+    readout: 'scroll', metric: 'scrub', viz: 'moon',
+    x: 0.12, y: 0.52, depth: 0.74, narrow: true,
   },
   {
-    glyph: '✧', label: 'State', sub: 'The Ledger',
-    readout: 'one source', metric: 'of truth', viz: 'embers',
-    x: 0.87, y: 0.6, depth: 0.66,
+    glyph: '✴', label: 'The Descent', sub: 'The Fall',
+    readout: 'Lenis', metric: 'parallax', viz: 'embers',
+    x: 0.88, y: 0.5, depth: 0.68, narrow: true,
   },
   {
-    glyph: '❂', label: 'Systems', sub: 'The Lattice',
-    readout: 'typed', metric: 'end-to-end', viz: 'stars',
-    x: 0.28, y: 0.86, depth: 0.55, narrow: true,
+    glyph: '❂', label: 'The Wall', sub: 'The Ward',
+    readout: 'frozen', metric: 'monster', viz: 'stars',
+    x: 0.18, y: 0.82, depth: 0.6,
   },
   {
-    glyph: '✦', label: 'Interface', sub: 'The Threshold',
-    readout: 'reachable by', metric: 'all', viz: 'comet',
-    x: 0.74, y: 0.85, depth: 0.5,
+    glyph: '✧', label: 'Observatory', sub: 'The Console',
+    readout: 'you are', metric: 'here', viz: 'comet',
+    x: 0.5, y: 0.9, depth: 0.52, narrow: true,
+  },
+  {
+    glyph: '❖', label: 'The Arcade', sub: 'The Dungeon',
+    readout: 'Phaser', metric: 'maze', viz: 'embers',
+    x: 0.82, y: 0.82, depth: 0.5,
   },
 ]
+
+// Zip each panel with its Spellbook entry (same page order) + a stable index
+// (used for the sheen delay and to survive the phone-narrow filter).
+const MODULES = PANELS.map((p, i) => ({ ...p, index: i, spell: SPELLBOOK[i] }))
 
 // Little arcane readouts, kept as markup fragments so a panel just picks one:
 // a shooting-star comet, a twinkling constellation, an orbiting moon, embers.
@@ -156,31 +173,43 @@ function build(mount) {
     <span class="obs-status"><span class="obs-star" aria-hidden="true">✦</span>the circle is open</span>`
   stage.appendChild(hud)
 
-  // The floating glass panels.
+  // The reveal modal — created once and mounted on <body> so it escapes the
+  // stage's overflow/perspective. Every panel opens it with its own incantation.
+  const disposers = []
+  const modal = createModal()
+  disposers.push(() => modal.destroy())
+
+  // The floating glass panels — one per module; each opens the modal on click.
+  // A <button> (not <article>) so it's focusable and keyboard-activatable; its
+  // children are phrasing spans so the button holds only valid content.
   const field = document.createElement('div')
   field.className = 'obs-field'
   const narrow = mqNarrow.matches
-  const defs = narrow ? PANELS.filter((p) => !p.narrow) : PANELS
-  const panels = defs.map((p, i) => {
-    const elx = document.createElement('article')
-    elx.className = 'holo-card'
-    elx.style.left = p.x * 100 + '%'
-    elx.style.top = p.y * 100 + '%'
-    elx.style.setProperty('--depth', p.depth.toFixed(3))
-    elx.style.setProperty('--i', String(i))
-    elx.innerHTML = `
+  const defs = narrow ? MODULES.filter((m) => !m.narrow) : MODULES
+  const panels = defs.map((m) => {
+    const btn = document.createElement('button')
+    btn.type = 'button'
+    btn.className = 'holo-card'
+    btn.setAttribute('aria-haspopup', 'dialog')
+    btn.style.left = m.x * 100 + '%'
+    btn.style.top = m.y * 100 + '%'
+    btn.style.setProperty('--depth', m.depth.toFixed(3))
+    btn.style.setProperty('--i', String(m.index))
+    btn.innerHTML = `
       <span class="hc-scan" aria-hidden="true"></span>
-      <header class="hc-head">
-        <span class="hc-glyph" aria-hidden="true">${p.glyph}</span>
+      <span class="hc-head">
+        <span class="hc-glyph" aria-hidden="true">${m.glyph}</span>
         <span class="hc-titles">
-          <span class="hc-label">${p.label}</span>
-          <span class="hc-sub">${p.sub}</span>
+          <span class="hc-label">${m.label}</span>
+          <span class="hc-sub">${m.sub}</span>
         </span>
-      </header>
-      <p class="hc-readout"><span class="hc-key">${p.readout}</span> <em>${p.metric}</em></p>
-      <div class="hc-viz">${VIZ[p.viz] || ''}</div>`
-    field.appendChild(elx)
-    return { el: elx, ...p }
+      </span>
+      <span class="hc-readout"><span class="hc-key">${m.readout}</span> <em>${m.metric}</em></span>
+      <span class="hc-viz">${VIZ[m.viz] || ''}</span>
+      <span class="hc-reveal">Read the spell<span class="hc-reveal-arrow" aria-hidden="true">↗</span></span>`
+    btn.addEventListener('click', () => modal.open(m))
+    field.appendChild(btn)
+    return { el: btn, ...m }
   })
   stage.appendChild(field)
 
@@ -194,9 +223,10 @@ function build(mount) {
   mount.appendChild(stage)
 
   // ── Reduced motion: settled composite, no canvas, no loop ─────────────────────
+  // (the panels + reveal modal still work — only the animation is dropped)
   if (reduce) {
     stage.classList.add('is-live')
-    return () => {}
+    return () => disposers.forEach((fn) => fn())
   }
 
   // ── WebGL core (optional enhancement) ─────────────────────────────────────────
@@ -347,6 +377,7 @@ function build(mount) {
       stage.removeEventListener('pointerleave', onPointerLeave)
     }
     if (gl) gl.dispose()
+    disposers.forEach((fn) => fn())
   }
 }
 
@@ -591,6 +622,188 @@ function buildGL(canvas, stage) {
       try {
         renderer.forceContextLoss()
       } catch {}
+    },
+  }
+}
+
+// ── The reveal modal: the grimoire, opened from a panel ─────────────────────────
+// A single dialog on <body> that shows one module's incantation(s) — the build
+// prompt plus any art prompts — each with a copy button. Pure DOM + clipboard;
+// closes on Escape, backdrop click or the ✕, traps Tab, and restores focus.
+
+const COPIED_MS = 1600
+
+// Copy `text` to the clipboard; resolve true on success. Falls back to a hidden
+// textarea + execCommand where the async API is unavailable (older / insecure ctx).
+async function copyText(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text)
+      return true
+    }
+  } catch {
+    /* fall through to the legacy path */
+  }
+  try {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.setAttribute('readonly', '')
+    ta.style.position = 'fixed'
+    ta.style.opacity = '0'
+    ta.style.pointerEvents = 'none'
+    document.body.appendChild(ta)
+    ta.select()
+    const ok = document.execCommand('copy')
+    document.body.removeChild(ta)
+    return ok
+  } catch {
+    return false
+  }
+}
+
+// Build one prompt block (tag + copy button + the prompt text).
+function promptBlock(prompt) {
+  const block = document.createElement('div')
+  block.className = 'gc-prompt'
+  block.innerHTML = `
+    <div class="gc-prompt-head">
+      <span class="gc-tag gc-tag--${prompt.kind}">${prompt.label}</span>
+      <button class="gc-copy" type="button" data-copy aria-label="Copy this prompt">
+        <span class="gc-copy-label">Copy</span>
+      </button>
+    </div>
+    <p class="gc-text"></p>`
+  // Set as textContent so quotes/braces are never parsed as HTML.
+  block.querySelector('.gc-text').textContent = prompt.text
+  return block
+}
+
+// Create the singleton modal; returns { open(module), destroy() }.
+function createModal() {
+  const modal = document.createElement('div')
+  modal.className = 'spell-modal'
+  modal.hidden = true
+  // Keep Lenis (smooth scroll) from stealing wheel/touch while the modal is open.
+  modal.setAttribute('data-lenis-prevent', '')
+  modal.innerHTML = `
+    <div class="spell-modal-scrim" data-close></div>
+    <div class="spell-modal-panel" role="dialog" aria-modal="true" aria-labelledby="spell-modal-title" tabindex="-1">
+      <button class="spell-modal-close" type="button" data-close aria-label="Close the incantation">
+        <span aria-hidden="true">✕</span>
+      </button>
+      <header class="spell-modal-head">
+        <span class="spell-modal-glyph" aria-hidden="true"></span>
+        <span class="spell-modal-heading">
+          <span class="spell-modal-sub"></span>
+          <h3 class="spell-modal-name" id="spell-modal-title"></h3>
+          <p class="spell-modal-summary"></p>
+        </span>
+      </header>
+      <div class="spell-modal-body"></div>
+    </div>`
+  document.body.appendChild(modal)
+
+  const panel = modal.querySelector('.spell-modal-panel')
+  const glyphEl = modal.querySelector('.spell-modal-glyph')
+  const subEl = modal.querySelector('.spell-modal-sub')
+  const nameEl = modal.querySelector('.spell-modal-name')
+  const summaryEl = modal.querySelector('.spell-modal-summary')
+  const bodyEl = modal.querySelector('.spell-modal-body')
+
+  let isOpen = false
+  let lastFocused = null
+  let hideTimer = 0
+  const copyTimers = new WeakMap()
+
+  const open = (m) => {
+    glyphEl.textContent = m.glyph
+    subEl.textContent = m.sub
+    nameEl.textContent = m.label
+    summaryEl.textContent = m.spell.summary
+    bodyEl.replaceChildren(...entryPrompts(m.spell).map(promptBlock))
+    bodyEl.scrollTop = 0
+
+    lastFocused = document.activeElement
+    clearTimeout(hideTimer)
+    modal.hidden = false
+    void modal.offsetWidth // reflow so the open transition plays
+    modal.classList.add('is-open')
+    document.body.classList.add('spell-modal-lock')
+    isOpen = true
+    panel.focus()
+  }
+
+  const close = () => {
+    if (!isOpen) return
+    isOpen = false
+    modal.classList.remove('is-open')
+    document.body.classList.remove('spell-modal-lock')
+    clearTimeout(hideTimer)
+    hideTimer = setTimeout(() => {
+      modal.hidden = true
+    }, 280)
+    // Return focus to the opener (a panel button) — but never to something inside
+    // the modal we're hiding, which would strand focus on a display:none element.
+    if (lastFocused && lastFocused.focus && lastFocused.isConnected && !modal.contains(lastFocused)) {
+      lastFocused.focus()
+    }
+  }
+
+  const onClick = async (e) => {
+    if (e.target.closest('[data-close]')) {
+      close()
+      return
+    }
+    const btn = e.target.closest('[data-copy]')
+    if (!btn) return
+    const text = btn.closest('.gc-prompt')?.querySelector('.gc-text')?.textContent
+    if (!text) return
+    const ok = await copyText(text)
+    const label = btn.querySelector('.gc-copy-label')
+    if (label) label.textContent = ok ? 'Copied ✓' : 'Press ⌘C'
+    btn.classList.toggle('is-copied', ok)
+    clearTimeout(copyTimers.get(btn))
+    copyTimers.set(
+      btn,
+      setTimeout(() => {
+        if (label) label.textContent = 'Copy'
+        btn.classList.remove('is-copied')
+      }, COPIED_MS)
+    )
+  }
+  modal.addEventListener('click', onClick)
+
+  const onKey = (e) => {
+    if (!isOpen) return
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      close()
+      return
+    }
+    if (e.key === 'Tab') {
+      const f = Array.from(modal.querySelectorAll('button:not([disabled])'))
+      if (!f.length) return
+      const first = f[0]
+      const last = f[f.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+  }
+  document.addEventListener('keydown', onKey)
+
+  return {
+    open,
+    destroy() {
+      clearTimeout(hideTimer)
+      modal.removeEventListener('click', onClick)
+      document.removeEventListener('keydown', onKey)
+      document.body.classList.remove('spell-modal-lock')
+      modal.remove()
     },
   }
 }
