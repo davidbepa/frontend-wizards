@@ -141,10 +141,13 @@ const supportsScreen = () =>
 function build(mount) {
   const reduce = mqReduce.matches
 
-  // Tall scroll track; the stage pins inside it. (Reduced motion → natural height.)
+  // Tall scroll track; the stage pins inside it. The track height lives in CSS
+  // (.descent-track / .descent-mount, gated on prefers-reduced-motion) so the
+  // space is reserved BEFORE this lazy-loaded module builds — otherwise
+  // initialising it would grow the document and jump the scroll-progress bar.
+  // Reduced motion falls back to natural height.
   const track = document.createElement('div')
   track.className = 'descent-track'
-  if (!reduce) track.style.height = '620vh' // more vh = a longer, slower fall
 
   const stage = document.createElement('div')
   stage.className = 'descent-stage' + (reduce ? ' is-static' : '')

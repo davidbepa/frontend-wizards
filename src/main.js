@@ -27,13 +27,21 @@ const LAZY = [
   ['[data-observatory]', () => import('./modules/observatory.js').then((m) => m.initObservatory())],
 ]
 
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
 // Fetch + initialise a lazy module when its mount approaches the viewport. The
 // generous rootMargin gives the chunk time to download and the scene time to build
 // before it scrolls into view; without IntersectionObserver we just load eagerly.
+//
+// Under reduced motion the modules build a static, natural-height composite whose
+// size can't be reserved in CSS ahead of time (unlike the animated tall tracks,
+// which are reserved in sections.css). Loading at boot — while scrollTop is still
+// 0 — means that growth never shifts the scroll-progress bar. Either path keeps
+// the module a code-split chunk, off the entry bundle.
 function lazyLoad([selector, load]) {
   const el = document.querySelector(selector)
   if (!el) return
-  if (!('IntersectionObserver' in window)) {
+  if (prefersReduced || !('IntersectionObserver' in window)) {
     load()
     return
   }

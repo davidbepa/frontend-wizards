@@ -69,9 +69,10 @@ function build(mount) {
   // ── DOM ────────────────────────────────────────────────────────────────────
   const track = document.createElement('div')
   track.className = 'conjure-track'
-  // Taller than a concurrent scene would need: typing and rendering now run
-  // back-to-back, so both beats get their own stretch of scroll.
-  if (!reduce) track.style.height = '560vh' // more vh = slower scrub
+  // The tall scroll-track height lives in CSS (.conjure-track / .conjure-mount,
+  // gated on prefers-reduced-motion) so the space is reserved BEFORE this
+  // lazy-loaded module builds — otherwise initialising it would grow the document
+  // and jump the scroll-progress bar. Reduced motion falls back to natural height.
 
   const stage = document.createElement('div')
   stage.className = 'conjure-stage' + (reduce ? ' is-static' : '')

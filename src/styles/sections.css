@@ -1019,8 +1019,10 @@
   margin-right: auto;
 }
 
-/* Tall scroll track; the stage pins inside it. Height is set inline by JS
-   (360vh) so reduced-motion can fall back to natural height. */
+/* Tall scroll track; the stage pins inside it. Its height — and the matching
+   space reserved on the (always-present) .conjure-mount — is set in the
+   prefers-reduced-motion block below, so reduced motion falls back to natural
+   height and lazy-initialising this module never grows the document. */
 .conjure-track {
   position: relative;
 }
@@ -1316,10 +1318,40 @@
   margin-right: auto;
 }
 
-/* Tall track; the stage pins inside it. Height is set inline by JS (620vh) so
-   reduced-motion can fall back to natural height. */
+/* Tall track; the stage pins inside it. Its height — and the matching space
+   reserved on .descent-mount — is set in the prefers-reduced-motion block below,
+   so reduced motion falls back to natural height and lazy-init never grows the
+   document. Top spacing lives on the (always-present) .descent-mount so it's
+   stable across the lazy build. */
 .descent-track {
   position: relative;
+}
+
+/* ── Lazy-load layout stability ─────────────────────────────────────────────
+   Conjure, Descent and the Observatory are code-split and initialise only as
+   their section nears the viewport (see src/main.js). Their mounts start empty
+   in the HTML, so building them would grow the document and jump the fixed
+   scroll-progress bar. Reserve each mount's final height up front. The tall
+   scroll tracks exist only under prefers-reduced-motion: no-preference (reduced
+   motion builds a static, unpinned composite at natural height), so those
+   reserves are gated the same way. Keep the heights in step with the tracks.
+   (more vh = a longer, slower scrub/fall — tune here.) */
+@media (prefers-reduced-motion: no-preference) {
+  .conjure-mount {
+    min-height: 560vh;
+  }
+  .conjure-track {
+    height: 560vh;
+  }
+  .descent-mount {
+    min-height: 620vh;
+  }
+  .descent-track {
+    height: 620vh;
+  }
+}
+
+.descent-mount {
   margin-top: clamp(2rem, 5vw, 3.5rem);
 }
 
@@ -1965,6 +1997,17 @@
 }
 
 /* ── the holographic viewport ── */
+/* The Observatory is code-split too, and its .obs-mount starts empty. Reserve the
+   console's height (and carry the stage's top spacing here, since the mount is
+   always present) so lazy-init doesn't shift the progress bar. Not motion-gated —
+   both motion modes render the stage at this height. NOTE: on phones a spell grid
+   is appended below the console whose height isn't reserved, so a small residual
+   shift remains on mobile only. */
+.obs-mount {
+  margin-top: clamp(2rem, 5vw, 3.6rem);
+  min-height: clamp(520px, 92svh, 1080px);
+}
+
 .obs-stage {
   --energy: 0; /* 0..1, written by JS */
   --rx: 0px; /* pointer-driven HUD/core shift */
@@ -1975,7 +2018,6 @@
      gutter on each side so the corner panels clear the screen edges. Centred with
      left:50% + a negative margin; body { overflow-x: clip } stops any scrollbar. */
   --obs-gutter: clamp(1rem, 5vw, 4rem);
-  margin-top: clamp(2rem, 5vw, 3.6rem);
   left: 50%;
   width: calc(100vw - 2 * var(--obs-gutter));
   margin-left: calc(var(--obs-gutter) - 50vw);
@@ -2467,6 +2509,10 @@
      shrinks to a centrepiece and the panels move out into the grid below it. */
   .obs-stage {
     height: clamp(420px, 66svh, 640px);
+  }
+  /* keep the reserved space in step with the smaller mobile console */
+  .obs-mount {
+    min-height: clamp(420px, 66svh, 640px);
   }
   .obs-reticle {
     width: 58%;
