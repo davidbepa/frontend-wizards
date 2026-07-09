@@ -52,7 +52,11 @@ function lazyLoad([selector, load]) {
         load()
       }
     },
-    { rootMargin: '1200px 0px' }
+    // ~2.5 viewports of lead. Generous on purpose: the chunk must download AND the
+    // scene must build before the section scrolls in, or its scroll-scrubbed
+    // entrance (e.g. the Observatory's assemble) misses its first pass on slower
+    // links. Still far below the hero, so a visitor who bounces downloads none of it.
+    { rootMargin: '2000px 0px' }
   )
   io.observe(el)
 }

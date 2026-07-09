@@ -42,12 +42,28 @@ export function initNavTeleport() {
   //     tracks, so we compute the absolute target ourselves and pass a number.
   const jump = (target) => {
     const lenis = getLenis()
+
+    // A section may nominate a child to CENTRE in the viewport on arrival instead
+    // of the default top-align (mark it `data-teleport-center`). The Observatory
+    // uses this: its payoff is the centred, fully-assembled console, not the
+    // heading above it — and its assemble animation only completes when the stage
+    // sits at viewport centre, so top-aligning would land you on a half-built rig.
+    const focus = target.querySelector('[data-teleport-center]')
+
     if (!lenis) {
-      target.scrollIntoView() // reduced-motion / no-Lenis: native isn't clamped
+      // reduced-motion / no-Lenis: native isn't clamped
+      ;(focus || target).scrollIntoView(focus ? { block: 'center' } : true)
       return
     }
     lenis.resize()
-    const top = target.getBoundingClientRect().top + window.scrollY
+    let top
+    if (focus) {
+      const r = focus.getBoundingClientRect()
+      // Centre the focus; if it's taller than the viewport, fall back to top-align.
+      top = r.top + window.scrollY - Math.max(0, (window.innerHeight - r.height) / 2)
+    } else {
+      top = target.getBoundingClientRect().top + window.scrollY
+    }
     lenis.scrollTo(top, { immediate: true, force: true })
   }
 

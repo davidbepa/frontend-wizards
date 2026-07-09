@@ -288,7 +288,14 @@ function build(mount) {
     const r = stage.getBoundingClientRect()
     const vh = window.innerHeight || 1
     const center = r.top + r.height / 2
-    const d = Math.abs(center - vh / 2) / vh // 0 centred → ~0.5 at edges
+    // Distance BELOW the viewport middle, only — the console assembles as it rises
+    // into view and then HOLDS assembled once centred. Using Math.abs here would
+    // make assembly a symmetric tent that peaks only at dead-centre and falls back
+    // to 0 as you keep scrolling past it: since this is the last section, scrolling
+    // on to the footer would rise the stage above centre and disassemble the whole
+    // console, leaving it empty exactly where a visitor comes to rest. Math.max(0,…)
+    // clamps that upper half so it stays lit from centre through the page bottom.
+    const d = Math.max(0, center - vh / 2) / vh // 0 once centred-or-higher; grows as it enters
     assembleT = clamp(1.15 - d * 1.7, 0, 1)
   }
 
